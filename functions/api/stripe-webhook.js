@@ -28,12 +28,11 @@ export async function onRequestPost(context) {
     const session = evento.data.object;
     const euros = (session.amount_total || 0) / 100;
     const meta = session.metadata || {};
-    const metodo =
-      Array.isArray(session.payment_method_types) &&
-      session.payment_method_types.includes("bizum") &&
-      session.payment_method_types.length === 1
-        ? "bizum"
-        : "tarjeta";
+
+    // El método "ofrecido" (session.payment_method_types) no es el método
+    // REAL usado por el cliente cuando se aceptan varios (card + bizum).
+    // Para saberlo de verdad hay que consultar el payment_intent expandido.
+    const metodo = await obtenerMetodoReal(session.id, env.STRIPE_SECRET_KEY);
 
     const SB = env.SUPABASE_URL;
     const KEY = env.SUPABASE_SERVICE_KEY;
@@ -79,6 +78,31 @@ export async function onRequestPost(context) {
   }
 
   return new Response("ok", { status: 200 });
+}
+
+// Consulta a Stripe el método de pago REAL usado en la sesión, expandiendo
+// payment_intent.payment_method en una sola llamada (docs.stripe.com/expand).
+// Si algo falla, devuelve "tarjeta" por defecto (no rompe el flujo de registro).
+async function obtenerMetodoReal(sessionId, stripeSecretKey) {
+  try {
+    if (!stripeSecretKey) return "tarjeta";
+
+    const url =
+      `https://api.stripe.com/v1/checkout/sessions/${sessionId}` +
+      `?expand[]=payment_intent.payment_method`;
+
+    const r = await fetch(url, {
+      headers: { Authorization: "Bearer " + stripeSecretKey },
+    });
+    if (!r.ok) return "tarjeta";
+
+    const sesionCompleta = await r.json();
+    const tipo = sesionCompleta?.payment_intent?.payment_method?.type;
+
+    return tipo === "bizum" ? "bizum" : "tarjeta";
+  } catch (e) {
+    return "tarjeta";
+  }
 }
 
 // Verificación de firma de Stripe con Web Crypto (HMAC-SHA256)
