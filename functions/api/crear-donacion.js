@@ -20,6 +20,20 @@ export async function onRequestPost(context) {
     "Content-Type": "application/json",
   };
 
+  // Dominios legítimos desde los que se permite construir las URLs de
+  // retorno de Stripe. Esto NO afecta a quién puede llamar a la API (eso
+  // lo gestiona Access-Control-Allow-Origin más arriba, que sigue siendo
+  // necesario porque Stripe Checkout es una redirección de navegador, no
+  // una llamada CORS), sino a dónde puede acabar el donante tras pagar.
+  // Sin esto, cualquiera podría clonar la web en otro dominio y usarla
+  // para generar sesiones de pago reales contra esta cuenta de Stripe,
+  // controlando la página de éxito/cancelación que ve el donante.
+  const ORIGENES_PERMITIDOS = [
+    "https://web-wolfram-cf.pages.dev",
+    "https://aswolfram.org",
+    "https://www.aswolfram.org",
+  ];
+
   try {
     const env = context.env;
     if (!env.STRIPE_SECRET_KEY) {
@@ -29,6 +43,15 @@ export async function onRequestPost(context) {
     const body = await context.request.json();
     const { importe, nombre, email, dni } = body || {};
 
+    // Defensa en profundidad: el HTML ya limita estos campos con maxlength,
+    // pero alguien podría llamar a esta API directamente sin pasar por el
+    // formulario. Stripe rechaza valores de metadata de más de 500
+    // caracteres con un error que tumba toda la sesión de pago (incluida
+    // la tarjeta), así que conviene cortar esto aquí con un mensaje claro.
+    if ((nombre && nombre.length > 200) || (email && email.length > 200) || (dni && dni.length > 50)) {
+      return new Response(JSON.stringify({ error: "Uno de los campos es demasiado largo." }), { status: 400, headers: cors });
+    }
+
     const euros = Number(importe);
     if (!euros || euros < 1) {
       return new Response(JSON.stringify({ error: "Importe no válido" }), { status: 400, headers: cors });
@@ -37,8 +60,14 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: "Importe demasiado alto. Contacta con la asociación." }), { status: 400, headers: cors });
     }
 
-    // Dominio desde el que se llama (para las URLs de retorno tras pagar)
-    const origin = context.request.headers.get("origin") || ("https://" + new URL(context.request.url).host);
+    // Dominio desde el que se llama (para las URLs de retorno tras pagar).
+    // Se valida contra la lista blanca; si no coincide, se usa siempre el
+    // dominio oficial de Cloudflare Pages como fallback seguro, en vez de
+    // confiar ciegamente en lo que el cliente diga ser.
+    const origenSolicitado = context.request.headers.get("origin");
+    const origin = ORIGENES_PERMITIDOS.includes(origenSolicitado)
+      ? origenSolicitado
+      : ORIGENES_PERMITIDOS[0];
 
     const params = new URLSearchParams();
     params.append("mode", "payment");

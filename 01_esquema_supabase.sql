@@ -35,6 +35,11 @@ create table if not exists donations (
   dni         text,
   anonimo     boolean default false,
   stripe_id   text unique,                          -- id de la sesión de Stripe (evita duplicados)
+  -- Marca si esta donación YA fue sumada al contador de campaign.recaudado_tarjeta.
+  -- Es la clave de la idempotencia real: el registro puede existir sin haber sumado
+  -- todavía (p. ej. si un intento anterior falló justo después de insertar), y un
+  -- reintento de Stripe debe poder completar la suma sin volver a contarla dos veces.
+  contado     boolean not null default false,
   creado      timestamptz default now()
 );
 
@@ -53,16 +58,37 @@ grant select on totales to anon;
 
 -- ============================================================
 --  FUNCIÓN ATÓMICA para sumar a la barra sin riesgo de que dos
---  pagos simultáneos se pisen. El webhook la llama vía RPC.
+--  pagos simultáneos se pisen, Y sin riesgo de contar dos veces
+--  la MISMA donación si un reintento de Stripe llega después de
+--  un fallo parcial. La idempotencia real vive aquí: solo suma
+--  si la fila de donations con ese stripe_id existe y aún no
+--  está marcada como "contado". Ambas cosas (marcar + sumar)
+--  ocurren en una sola sentencia, por lo que es imposible que
+--  dos llamadas concurrentes con el mismo stripe_id sumen dos
+--  veces, ni que una llamada repetida vuelva a sumar.
 -- ============================================================
-create or replace function sumar_donacion(cantidad numeric)
-returns void
-language sql
+create or replace function sumar_donacion(p_stripe_id text, cantidad numeric)
+returns boolean
+language plpgsql
 as $$
-  update campaign
-     set recaudado_tarjeta = recaudado_tarjeta + cantidad,
-         actualizado = current_date
-   where id = 1;
+declare
+  marcada boolean;
+begin
+  update donations
+     set contado = true
+   where stripe_id = p_stripe_id
+     and contado = false
+  returning true into marcada;
+
+  if marcada then
+    update campaign
+       set recaudado_tarjeta = recaudado_tarjeta + cantidad,
+           actualizado = current_date
+     where id = 1;
+  end if;
+
+  return coalesce(marcada, false);
+end;
 $$;
 
 -- ============================================================
