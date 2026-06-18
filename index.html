@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Asociación Síndrome de Wolfram · Cumpleaños solidario</title>
-<meta name="description" content="Hoy es su cumpleaños, pero el regalo puede cambiar muchas vidas. Colabora con la investigación del Síndrome de Wolfram.">
-<meta property="og:title" content="Hoy es su cumpleaños, pero el regalo puede cambiar muchas vidas">
+<meta name="description" content="El 26 de junio es su cumpleaños, pero el regalo puede cambiar muchas vidas. Colabora con la investigación del Síndrome de Wolfram.">
+<meta property="og:title" content="El 26 de junio es su cumpleaños, pero el regalo puede cambiar muchas vidas">
 <meta property="og:description" content="Celebramos el cumpleaños de la Dra. Gema Esteban impulsando la investigación del Síndrome de Wolfram.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://amazing-elf-514ac4.netlify.app/og-wolfram.jpg">
@@ -13,7 +13,7 @@
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hoy es su cumpleaños, pero el regalo puede cambiar muchas vidas">
+<meta name="twitter:title" content="El 26 de junio es su cumpleaños, pero el regalo puede cambiar muchas vidas">
 <meta name="twitter:description" content="Celebramos el cumpleaños de la Dra. Gema Esteban impulsando la investigación del Síndrome de Wolfram.">
 <meta name="twitter:image" content="https://amazing-elf-514ac4.netlify.app/og-wolfram.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -196,7 +196,7 @@
 <script>
 const CONFIG = {
   recaudado: 0,
-  objetivo: 2000,
+  objetivo: 1000,
   donantes: 0,
   actualizado: "26 junio 2026"
 };
@@ -219,7 +219,7 @@ const CONFIG = {
   <section class="hero">
     <div>
       <h1>
-        <span class="h1a" data-i18n="hero.titulo1">Hoy, 26 de junio, es su cumpleaños,</span>
+        <span class="h1a" data-i18n="hero.titulo1">El 26 de junio es su cumpleaños,</span>
         <span class="h1b" data-i18n="hero.titulo2">pero el regalo puede cambiar muchas vidas. &#9825;</span>
       </h1>
       <div class="raya"></div>
@@ -242,12 +242,13 @@ const CONFIG = {
   <section class="panel">
     <div class="panel-izq">
       <div class="gran" id="recaudado">0 €</div>
-      <div class="gran-lbl"><span data-i18n="barra.recaudadosDe">recaudados de</span> <span id="obj-lbl">0 €</span></div>
+      <div class="gran-lbl"><span data-i18n="barra.recaudadosDe">recaudados de</span> <span id="obj-lbl">0 €</span> <span id="extra-objetivo" style="display:none;font-weight:700;color:var(--coral)"></span></div>
     </div>
     <div>
       <h2 data-i18n="barra.titulo">Juntos ya hemos avanzado mucho &#9825;</h2>
       <div class="pista"><div class="relleno" id="relleno"><b id="pct"></b></div></div>
 <div class="extremos" style="justify-content:flex-end"><span id="obj-ext">0 €</span></div>      
+<p id="objetivo-alcanzado" data-i18n="barra.objetivoAlcanzado" style="display:none;margin-top:10px;font-size:.95rem;color:var(--suave)">¡Objetivo alcanzado! Cada donación adicional se sigue destinando íntegramente a la asociación.</p>
 <div class="meta2">
         <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c2 .4 4 2 4 4.5"/></svg><b id="donantes">0</b>&nbsp;<span data-i18n="barra.personas">personas han colaborado</span></span>
         <span class="div"></span>
@@ -316,6 +317,7 @@ const CONFIG = {
     <button class="modal-x" id="modal-x" aria-label="Cerrar">&times;</button>
     <h3 id="modal-tit" data-i18n="modal.titulo">Haz tu donación</h3>
     <p class="modal-sub" data-i18n="modal.subtitulo">Elige el importe. Después podrás pagar con tarjeta o Bizum.</p>
+    <p id="aviso-objetivo-modal" data-i18n="modal.avisoObjetivo" style="display:none;font-size:.85rem;color:var(--suave);background:var(--crema);border-radius:10px;padding:10px 12px;margin:-4px 0 14px">Ya hemos alcanzado el objetivo inicial. Tu donación seguirá ayudando igualmente a la investigación.</p>
 
     <div class="importes" id="importes">
       <button type="button" data-imp="10">10 €</button>
@@ -392,7 +394,7 @@ const CONFIG = {
     es: {
       header: { donar: "DONAR" },
       hero: {
-        titulo1: "Hoy, 26 de junio, es su cumpleaños,",
+        titulo1: "El 26 de junio es su cumpleaños,",
         titulo2: "pero el regalo puede cambiar muchas vidas. &#9825;",
         celebra: "Celebramos el cumpleaños de",
         rol: "Referente nacional en Síndrome de Wolfram.",
@@ -401,6 +403,8 @@ const CONFIG = {
       },
       barra: {
         recaudadosDe: "recaudados de",
+        objetivoAlcanzado: "¡Objetivo alcanzado! Cada donación adicional se sigue destinando íntegramente a la asociación.",
+        extraObjetivo: "+{x} sobre el objetivo",
         titulo: "Juntos ya hemos avanzado mucho &#9825;",
         personas: "personas han colaborado",
         actualizado: "Actualizado:"
@@ -429,6 +433,7 @@ const CONFIG = {
       modal: {
         titulo: "Haz tu donación",
         subtitulo: "Elige el importe. Después podrás pagar con tarjeta o Bizum.",
+        avisoObjetivo: "Ya hemos alcanzado el objetivo inicial. Tu donación seguirá ayudando igualmente a la investigación.",
         otroImporte: "Otro importe (€)",
         otroPlaceholder: "Ej. 30",
         nombreLabel: "Nombre y apellidos",
@@ -470,7 +475,7 @@ const CONFIG = {
     en: {
       header: { donar: "DONATE" },
       hero: {
-        titulo1: "Today, June 26th, is her birthday,",
+        titulo1: "June 26th is her birthday,",
         titulo2: "but the gift can change many lives. &#9825;",
         celebra: "Celebrating the birthday of",
         rol: "National reference in Wolfram Syndrome.",
@@ -479,6 +484,8 @@ const CONFIG = {
       },
       barra: {
         recaudadosDe: "raised out of",
+        objetivoAlcanzado: "Goal reached! Every additional donation still goes entirely to the association.",
+        extraObjetivo: "+{x} above the goal",
         titulo: "Together we've already made great progress &#9825;",
         personas: "people have contributed",
         actualizado: "Updated:"
@@ -507,6 +514,7 @@ const CONFIG = {
       modal: {
         titulo: "Make your donation",
         subtitulo: "Choose the amount. You'll then be able to pay by card or Bizum.",
+        avisoObjetivo: "We've already reached the initial goal. Your donation will still help the research just the same.",
         otroImporte: "Other amount (€)",
         otroPlaceholder: "E.g. 30",
         nombreLabel: "Full name",
@@ -548,7 +556,7 @@ const CONFIG = {
     it: {
       header: { donar: "DONA" },
       hero: {
-        titulo1: "Oggi, 26 giugno, è il suo compleanno,",
+        titulo1: "Il 26 giugno è il suo compleanno,",
         titulo2: "ma il regalo può cambiare molte vite. &#9825;",
         celebra: "Festeggiamo il compleanno di",
         rol: "Punto di riferimento nazionale per la Sindrome di Wolfram.",
@@ -557,6 +565,8 @@ const CONFIG = {
       },
       barra: {
         recaudadosDe: "raccolti su",
+        objetivoAlcanzado: "Obiettivo raggiunto! Ogni donazione aggiuntiva continua ad andare interamente all'associazione.",
+        extraObjetivo: "+{x} sopra l'obiettivo",
         titulo: "Insieme abbiamo già fatto molti progressi &#9825;",
         personas: "persone hanno contribuito",
         actualizado: "Aggiornato:"
@@ -585,6 +595,7 @@ const CONFIG = {
       modal: {
         titulo: "Effettua la tua donazione",
         subtitulo: "Scegli l'importo. Dopo potrai pagare con carta o Bizum.",
+        avisoObjetivo: "Abbiamo già raggiunto l'obiettivo iniziale. La tua donazione continuerà comunque ad aiutare la ricerca.",
         otroImporte: "Altro importo (€)",
         otroPlaceholder: "Es. 30",
         nombreLabel: "Nome e cognome",
@@ -690,6 +701,7 @@ const CONFIG = {
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqZHN0Z2xudGVhZWd4aGd4YWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTI2NDUsImV4cCI6MjA5NzEyODY0NX0.-ynUu7wypz2iiDru8D7XedbEP_IwnWirLIaiAgkbsPo";
 
   // ---------- Pintar la barra ----------
+  let OBJETIVO_ALCANZADO = false;
   function pintarBarra(recaudado, objetivo, donantes, fecha){
     const pct=Math.min(100,Math.round((recaudado/objetivo)*100)||0);
     $('recaudado').textContent=eur(recaudado);
@@ -699,6 +711,21 @@ const CONFIG = {
     if(fecha) $('fecha').textContent=fecha;
     $('pct').textContent = pct>8 ? pct+'%' : '';
     requestAnimationFrame(()=>{$('relleno').style.width=pct+'%';});
+    OBJETIVO_ALCANZADO = Number(recaudado) >= Number(objetivo) && Number(objetivo) > 0;
+    const avisoEl = $('objetivo-alcanzado');
+    if(avisoEl) avisoEl.style.display = OBJETIVO_ALCANZADO ? 'block' : 'none';
+    const avisoModalEl = $('aviso-objetivo-modal');
+    if(avisoModalEl) avisoModalEl.style.display = OBJETIVO_ALCANZADO ? 'block' : 'none';
+    const extraEl = $('extra-objetivo');
+    if(extraEl){
+      const extra = Number(recaudado) - Number(objetivo);
+      if(OBJETIVO_ALCANZADO && extra > 0){
+        extraEl.textContent = t('barra.extraObjetivo').replace('{x}', eur(extra));
+        extraEl.style.display = 'inline';
+      } else {
+        extraEl.style.display = 'none';
+      }
+    }
   }
 
   async function cargarBarra(){
