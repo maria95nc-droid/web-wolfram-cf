@@ -40,6 +40,39 @@ export async function onRequestPost(context) {
       return new Response(JSON.stringify({ error: "Falta configurar STRIPE_SECRET_KEY" }), { status: 500, headers: cors });
     }
 
+    // ------------------------------------------------------------
+    // LÍMITE DE PETICIONES (rate limiting) por IP, usando Cloudflare KV.
+    // El dominio aswolfram.org no está gestionado en Cloudflare, así que
+    // las reglas de Rate Limiting del panel (a nivel de zona DNS) no están
+    // disponibles. Esta es la alternativa equivalente a nivel de código:
+    // máximo 10 peticiones por IP cada 60 segundos a este endpoint. Si se
+    // supera, se rechaza con 429 ANTES de gastar ninguna llamada a Stripe.
+    // Requiere un namespace KV llamado RATE_LIMIT_KV enlazado en Cloudflare
+    // (Settings → Functions → KV namespace bindings). Si no está enlazado,
+    // se omite el límite en vez de romper la donación (fail-open).
+    // ------------------------------------------------------------
+    if (env.RATE_LIMIT_KV) {
+      const ip = context.request.headers.get("CF-Connecting-IP") || "desconocida";
+      const clave = `ratelimit:${ip}`;
+      const LIMITE = 10;
+      const VENTANA_SEGUNDOS = 60;
+      try {
+        const actual = await env.RATE_LIMIT_KV.get(clave);
+        const contador = actual ? Number(actual) : 0;
+        if (contador >= LIMITE) {
+          return new Response(
+            JSON.stringify({ error: "Demasiadas solicitudes. Inténtalo de nuevo en un minuto." }),
+            { status: 429, headers: cors }
+          );
+        }
+        // expirationTtl reinicia el contador automáticamente pasada la ventana
+        await env.RATE_LIMIT_KV.put(clave, String(contador + 1), { expirationTtl: VENTANA_SEGUNDOS });
+      } catch (e) {
+        // Si KV falla por cualquier motivo, no bloqueamos donaciones legítimas
+        // por un problema de infraestructura ajeno al donante.
+      }
+    }
+
     const body = await context.request.json();
     const { importe, nombre, email, dni } = body || {};
 

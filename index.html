@@ -335,11 +335,11 @@ const CONFIG = {
       <input type="text" id="d-nombre" maxlength="120" data-i18n-placeholder="modal.nombrePlaceholder" placeholder="Tu nombre">
     </div>
     <div class="campo">
-      <label for="d-email" data-i18n-html="modal.emailLabel">Email <span class="req">(para el certificado)</span></label>
+      <label for="d-email" data-i18n-html="modal.emailLabel">Email <span class="req">(opcional, para enviarte el certificado)</span></label>
       <input type="email" id="d-email" maxlength="120" placeholder="tu@email.com">
     </div>
     <div class="campo">
-      <label for="d-dni" data-i18n-html="modal.dniLabel">DNI <span class="req">(para desgravar)</span></label>
+      <label for="d-dni" data-i18n-html="modal.dniLabel">DNI <span class="req">(opcional, necesario para poder desgravar)</span></label>
       <input type="text" id="d-dni" maxlength="20" placeholder="12345678Z">
     </div>
 
@@ -351,7 +351,7 @@ const CONFIG = {
     </div>
 
     <button class="modal-donar" id="modal-donar" data-i18n="modal.botonContinuar">Continuar al pago seguro →</button>
-    <p class="modal-nota" data-i18n="modal.nota">Pago cifrado y seguro. Tus datos solo se usan para emitir el certificado de donación.</p>
+    <p class="modal-nota" data-i18n="modal.nota">Pago cifrado y seguro. El DNI es opcional pero necesario si quieres desgravar; el email solo se usa para enviarte el certificado.</p>
   </div>
 </div>
 
@@ -413,7 +413,7 @@ const CONFIG = {
         titulo: "Tu donación desgrava en la declaración de la renta",
         parrafo1: 'La Asociación Síndrome de Wolfram es una <span class="destacar">entidad de utilidad pública</span> acogida a la Ley 49/2002, por lo que Hacienda te devuelve una parte de tu donativo:',
         parrafo2: '&#8226; El <span class="destacar">80%</span> de los primeros <span class="destacar">250&nbsp;€</span> donados (es decir, por 250&nbsp;€ recuperas 200&nbsp;€).<br>&#8226; El <span class="destacar">40%</span> de la cantidad que supere los 250&nbsp;€.',
-        aviso: '&#9888;&#65039; <strong>Importante:</strong> al donar te pediremos tu <strong>DNI</strong> y tu <strong>email</strong> para poder enviarte el certificado de donación.',
+        aviso: '&#9888;&#65039; <strong>Importante:</strong> para que tu donación pueda desgravarse, necesitamos tu <strong>DNI</strong>: sin él, Hacienda no podrá vincular la donación a tu nombre. El <strong>email</strong> es opcional y solo se usa si además quieres que te enviemos el certificado en papel.',
         nota: "Información orientativa según la normativa estatal vigente (art. 19, Ley 49/2002). Pueden existir deducciones autonómicas adicionales. Consulta tu caso con un asesor si tienes dudas."
       },
       ayudar: {
@@ -438,11 +438,11 @@ const CONFIG = {
         otroPlaceholder: "Ej. 30",
         nombreLabel: "Nombre y apellidos",
         nombrePlaceholder: "Tu nombre",
-        emailLabel: 'Email <span class="req">(para el certificado)</span>',
-        dniLabel: 'DNI <span class="req">(para desgravar)</span>',
+        emailLabel: 'Email <span class="req">(opcional, para enviarte el certificado)</span>',
+        dniLabel: 'DNI <span class="req">(opcional, necesario para poder desgravar)</span>',
         privacidadCheck: 'He leído y acepto la <a href="#" id="abrir-privacidad">política de privacidad</a>.',
         botonContinuar: "Continuar al pago seguro →",
-        nota: "Pago cifrado y seguro. Tus datos solo se usan para emitir el certificado de donación."
+        nota: "Pago cifrado y seguro. El DNI es opcional pero necesario si quieres desgravar; el email solo se usa para enviarte el certificado."
       },
       privacidad: {
         titulo: "Política de privacidad",
@@ -464,6 +464,7 @@ const CONFIG = {
       alertas: {
         importeInvalido: "Elige o escribe un importe (mínimo 1 €).",
         emailInvalido: "Escribe un email válido para enviarte el certificado.",
+        confirmarSinDni: "Vas a donar sin indicar tu DNI. Sin él, no podremos incluir tu donación en la declaración a Hacienda y no podrás desgravarla en la renta.\n\nPulsa Cancelar para volver y añadir tu DNI, o Aceptar para continuar sin desgravación.",
         privacidadNoAceptada: "Debes aceptar la política de privacidad para continuar.",
         stripeInactivo: "¡Gracias! El pago con tarjeta y Bizum estará disponible muy pronto.\n\n(Has elegido donar {importe} €. Cuando Stripe esté activo, aquí se abrirá la pasarela de pago.)",
         conectando: "Conectando con el pago…",
@@ -494,7 +495,7 @@ const CONFIG = {
         titulo: "Your donation is tax-deductible",
         parrafo1: 'The Wolfram Syndrome Association is a <span class="destacar">public-benefit entity</span> recognized under Spanish Law 49/2002, so the Spanish Tax Agency returns part of your donation:',
         parrafo2: '&#8226; <span class="destacar">80%</span> of the first <span class="destacar">€250</span> donated (meaning you get back €200 for €250 donated).<br>&#8226; <span class="destacar">40%</span> of any amount above €250.',
-        aviso: '&#9888;&#65039; <strong>Important:</strong> when donating we will ask for your <strong>ID number</strong> and <strong>email</strong> so we can send you the donation certificate.',
+        aviso: '&#9888;&#65039; <strong>Important:</strong> for your donation to be tax-deductible, we need your <strong>ID number</strong>: without it, the tax authorities cannot link the donation to your name. The <strong>email</strong> is optional and only used if you also want us to send you a paper certificate.',
         nota: "Informational guidance based on current Spanish national regulations (art. 19, Law 49/2002). Additional regional deductions may apply. Consult an advisor if you have questions."
       },
       ayudar: {
@@ -519,11 +520,11 @@ const CONFIG = {
         otroPlaceholder: "E.g. 30",
         nombreLabel: "Full name",
         nombrePlaceholder: "Your name",
-        emailLabel: 'Email <span class="req">(for the certificate)</span>',
-        dniLabel: 'ID number <span class="req">(for the tax deduction)</span>',
+        emailLabel: 'Email <span class="req">(optional, to send you the certificate)</span>',
+        dniLabel: 'ID number <span class="req">(optional, needed to claim the deduction)</span>',
         privacidadCheck: 'I have read and accept the <a href="#" id="abrir-privacidad">privacy policy</a>.',
         botonContinuar: "Continue to secure payment →",
-        nota: "Secure, encrypted payment. Your data is only used to issue the donation certificate."
+        nota: "Secure, encrypted payment. Your ID number is optional but needed to claim the tax deduction; your email is only used to send you the certificate."
       },
       privacidad: {
         titulo: "Privacy policy",
@@ -545,6 +546,7 @@ const CONFIG = {
       alertas: {
         importeInvalido: "Choose or enter an amount (minimum €1).",
         emailInvalido: "Enter a valid email so we can send you the certificate.",
+        confirmarSinDni: "You're about to donate without your ID number. Without it, we can't report your donation to the tax authorities and you won't be able to claim the deduction.\n\nPress Cancel to go back and add your ID number, or OK to continue without the deduction.",
         privacidadNoAceptada: "You must accept the privacy policy to continue.",
         stripeInactivo: "Thank you! Card and Bizum payments will be available very soon.\n\n(You chose to donate €{importe}. Once Stripe is active, the payment gateway will open here.)",
         conectando: "Connecting to payment…",
@@ -575,7 +577,7 @@ const CONFIG = {
         titulo: "La tua donazione è deducibile dalle tasse",
         parrafo1: 'L\'Associazione Sindrome di Wolfram è un <span class="destacar">ente di pubblica utilità</span> riconosciuto secondo la legge spagnola 49/2002, per cui l\'Agenzia delle Entrate spagnola restituisce parte della tua donazione:',
         parrafo2: '&#8226; Il <span class="destacar">80%</span> dei primi <span class="destacar">250&nbsp;€</span> donati (cioè, per 250&nbsp;€ recuperi 200&nbsp;€).<br>&#8226; Il <span class="destacar">40%</span> dell\'importo che supera i 250&nbsp;€.',
-        aviso: '&#9888;&#65039; <strong>Importante:</strong> al momento della donazione ti chiederemo il tuo <strong>codice fiscale/documento d\'identità</strong> e la tua <strong>email</strong> per poterti inviare il certificato di donazione.',
+        aviso: '&#9888;&#65039; <strong>Importante:</strong> per poter detrarre la tua donazione abbiamo bisogno del tuo <strong>codice fiscale</strong>: senza di esso, il fisco non potrà collegare la donazione al tuo nome. L\'<strong>email</strong> è facoltativa e serve solo se desideri anche ricevere un certificato cartaceo.',
         nota: "Informazione orientativa secondo la normativa statale spagnola vigente (art. 19, Legge 49/2002). Possono esistere deduzioni regionali aggiuntive. Consulta un consulente in caso di dubbi."
       },
       ayudar: {
@@ -600,11 +602,11 @@ const CONFIG = {
         otroPlaceholder: "Es. 30",
         nombreLabel: "Nome e cognome",
         nombrePlaceholder: "Il tuo nome",
-        emailLabel: 'Email <span class="req">(per il certificato)</span>',
-        dniLabel: 'Documento d\'identità <span class="req">(per la deduzione fiscale)</span>',
+        emailLabel: 'Email <span class="req">(facoltativo, per inviarti il certificato)</span>',
+        dniLabel: 'Documento d\'identità <span class="req">(facoltativo, necessario per la detrazione)</span>',
         privacidadCheck: 'Ho letto e accetto la <a href="#" id="abrir-privacidad">politica sulla privacy</a>.',
         botonContinuar: "Continua al pagamento sicuro →",
-        nota: "Pagamento sicuro e cifrato. I tuoi dati vengono utilizzati solo per emettere il certificato di donazione."
+        nota: "Pagamento sicuro e cifrato. Il documento d'identità è facoltativo ma necessario per la detrazione fiscale; l'email serve solo per inviarti il certificato."
       },
       privacidad: {
         titulo: "Politica sulla privacy",
@@ -626,6 +628,7 @@ const CONFIG = {
       alertas: {
         importeInvalido: "Scegli o inserisci un importo (minimo 1 €).",
         emailInvalido: "Inserisci un'email valida per inviarti il certificato.",
+        confirmarSinDni: "Stai per donare senza indicare il tuo codice fiscale. Senza di esso non potremo includere la tua donazione nella dichiarazione al fisco e non potrai detrarla.\n\nPremi Annulla per tornare indietro e aggiungere il codice fiscale, oppure OK per continuare senza detrazione.",
         privacidadNoAceptada: "Devi accettare la politica sulla privacy per continuare.",
         stripeInactivo: "Grazie! Il pagamento con carta e Bizum sarà disponibile molto presto.\n\n(Hai scelto di donare {importe} €. Quando Stripe sarà attivo, qui si aprirà il gateway di pagamento.)",
         conectando: "Connessione al pagamento…",
@@ -708,7 +711,12 @@ const CONFIG = {
     $('obj-lbl').textContent=eur(objetivo);
     $('obj-ext').textContent=eur(objetivo);
     $('donantes').textContent=donantes;
-    if(fecha) $('fecha').textContent=fecha;
+    // La fecha mostrada es siempre "hoy" (la del dispositivo del visitante),
+    // no la fecha de la última donación que venga de Supabase. Antes se
+    // usaba el parámetro `fecha` (actualizado de la tabla campaign), que
+    // solo cambiaba cuando entraba una donación nueva y por tanto podía
+    // quedarse "congelada" varios días mostrando una fecha pasada.
+    $('fecha').textContent = fechaBonita(new Date());
     $('pct').textContent = pct>8 ? pct+'%' : '';
     requestAnimationFrame(()=>{$('relleno').style.width=pct+'%';});
     OBJETIVO_ALCANZADO = Number(recaudado) >= Number(objetivo) && Number(objetivo) > 0;
@@ -795,8 +803,19 @@ const CONFIG = {
     const dni    = $('d-dni').value.trim();
 
     if(!importe || importe < 1){ alert(t('alertas.importeInvalido')); return; }
-    if(!email || !email.includes('@')){ alert(t('alertas.emailInvalido')); return; }
+    if(email && !email.includes('@')){ alert(t('alertas.emailInvalido')); return; }
     if(!$('d-acepta-privacidad').checked){ alert(t('alertas.privacidadNoAceptada')); return; }
+
+    // El DNI es opcional para poder donar, pero sin él Hacienda no puede
+    // vincular la donación al donante y este pierde la deducción fiscal.
+    // En vez de bloquear el campo (lo que reduciría donaciones completas
+    // por fricción), avisamos justo antes de pagar y dejamos que decida
+    // con la información delante, sin obligarle a rellenarlo si no le
+    // importa la desgravación.
+    if(!dni){
+      const seguirSinDni = confirm(t('alertas.confirmarSinDni'));
+      if(!seguirSinDni) return;
+    }
 
     if(!STRIPE_ACTIVO){
       alert(t('alertas.stripeInactivo').replace('{importe}', importe));
