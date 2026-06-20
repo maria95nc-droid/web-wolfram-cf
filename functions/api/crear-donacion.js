@@ -29,6 +29,7 @@ export async function onRequestPost(context) {
   // para generar sesiones de pago reales contra esta cuenta de Stripe,
   // controlando la página de éxito/cancelación que ve el donante.
   const ORIGENES_PERMITIDOS = [
+    "https://donaciones.aswolfram.org",
     "https://web-wolfram-cf.pages.dev",
     "https://aswolfram.org",
     "https://www.aswolfram.org",

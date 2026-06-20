@@ -26,6 +26,19 @@ export async function onRequestPost(context) {
 
   if (evento.type === "checkout.session.completed") {
     const session = evento.data.object;
+
+    // Defensa en profundidad: checkout.session.completed es el evento que
+    // Stripe recomienda para el fulfillment, pero en casos límite (métodos
+    // de pago con confirmación retrasada) puede llegar con payment_status
+    // distinto de "paid". Lo comprobamos explícitamente antes de sumar
+    // nada, en vez de asumir que el tipo de evento ya lo garantiza.
+    if (session.payment_status !== "paid") {
+      return new Response(
+        "Pago no confirmado (payment_status: " + session.payment_status + "), no se suma.",
+        { status: 200 }
+      );
+    }
+
     const euros = (session.amount_total || 0) / 100;
     const meta = session.metadata || {};
 
