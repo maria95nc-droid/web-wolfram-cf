@@ -273,7 +273,7 @@ const CONFIG = {
     <div>
       <h2>Juntos ya hemos avanzado mucho &#9825;</h2>
       <div class="pista"><div class="relleno" id="relleno"><b id="pct"></b></div></div>
-      <div class="extremos"><span>0 €</span><span id="obj-ext">1000 €</span></div>
+      <div class="extremos"><span id="recaudado-ext">0 €</span><span id="obj-ext">1000 €</span></div>
       <p id="objetivo-alcanzado" style="display:none;margin-top:10px;font-size:.95rem;color:var(--suave)">¡Objetivo alcanzado! Cada donación adicional se sigue destinando íntegramente a la asociación.</p>
       <div class="meta2">
         <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c2 .4 4 2 4 4.5"/></svg><b id="donantes">0</b>&nbsp;<span>personas han colaborado</span></span>
@@ -393,6 +393,7 @@ const CONFIG = {
 
     $('recaudado').textContent = eur(recaudado);
     $('objetivo-lbl').textContent = eur(objetivo);
+    $('recaudado-ext').textContent = eur(recaudado);
     $('obj-ext').textContent = eur(objetivo);
     $('donantes').textContent = donantes;
     $('fecha').textContent = fechaBonita(datos.actualizado || CONFIG.actualizado);
