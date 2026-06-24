@@ -106,3 +106,17 @@ Correo certificado fiscal: aswolfram@aswolfram.org
 ## Texto fiscal
 
 La web indica que no recoge datos personales. Quien necesite certificado fiscal debe escribir a `aswolfram@aswolfram.org` con nombre, DNI/NIF, importe, fecha aproximada y justificante.
+
+
+## Comprobación rápida del panel de administración
+
+1. Abre `/admin.html`.
+2. Introduce el `ADMIN_TOKEN` que configuraste en Cloudflare.
+3. Cambia `Recaudado confirmado`, `Objetivo` o `Donantes anotados`.
+4. Pulsa **Guardar cambios**.
+5. Abre la portada pública y recarga la página: la barra y los contadores deben reflejar los nuevos valores.
+
+Si no guarda, revisa estas tres variables en Cloudflare Pages Functions:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `ADMIN_TOKEN`

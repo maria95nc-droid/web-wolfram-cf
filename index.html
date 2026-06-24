@@ -292,7 +292,7 @@ const CONFIG = {
     <p>La Asociación Síndrome de Wolfram es una <span class="destacar">entidad de utilidad pública</span> acogida a la Ley 49/2002. La web no recoge nombre, DNI ni datos personales del donante.</p>
     <p>Orientativamente, la deducción estatal puede alcanzar el <span class="destacar">80%</span> de los primeros <span class="destacar">250&nbsp;€</span> donados y el <span class="destacar">40%</span> de la cantidad que supere ese importe.</p>
     <div class="concepto-box">
-      &#9888;&#65039; <strong>Certificado fiscal:</strong> si necesitas certificado de donación, escribe a <a href="mailto:aswolfram@aswolfram.org"><strong>aswolfram@aswolfram.org</strong></a> indicando nombre y apellidos, DNI/NIF, importe, fecha aproximada, método utilizado y justificante si lo tienes.
+      &#9888;&#65039; <strong>Certificado fiscal:</strong> si vas a solicitarlo, procura indicar <strong>nombre, apellidos y DNI/NIF en el concepto del pago</strong>. Después, escribe a <a href="mailto:aswolfram@aswolfram.org"><strong>aswolfram@aswolfram.org</strong></a> indicando nombre y apellidos, DNI/NIF, importe, fecha aproximada, método utilizado y justificante si lo tienes.
     </div>
     <small>Información orientativa. La emisión del certificado queda sujeta a la comprobación del ingreso real por parte de AEIASW.</small>
   </section>
@@ -305,7 +305,7 @@ const CONFIG = {
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
       </div>
       <h3>Elige cómo donar</h3>
-      <p>Copia el dato que necesites y haz tu donación desde tu banco.</p>
+      <p>Elige transferencia o Bizum. Si quieres certificado fiscal o deducción, añade nombre, apellidos y DNI/NIF en el concepto del pago.</p>
       <div class="datos-pago" aria-label="Datos para donar">
         <div class="dato-pago">
           <div class="k">Transferencia bancaria</div>
@@ -315,15 +315,18 @@ const CONFIG = {
         </div>
         <div class="dato-pago">
           <div class="k"><span class="bizum-chip"><span class="bizum-icon">Bz</span> Bizum ONG</span></div>
-          <div class="v">02820</div>
-          <small>Usa el código Bizum ONG de la asociación.</small>
-          <button class="mini-copy" type="button" data-copy="02820">Copiar Bizum ONG</button>
+          <div class="v">Código Bizum ONG: <strong>02820</strong></div>
+          <small>También puedes localizar el destinatario con este teléfono: <strong>+34 638 85 98 70</strong>.</small>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <button class="mini-copy" type="button" data-copy="02820">Copiar código Bizum</button>
+            <button class="mini-copy" type="button" data-copy="+34638859870">Copiar teléfono Bizum</button>
+          </div>
         </div>
         <div class="dato-pago">
           <div class="k">Concepto recomendado</div>
-          <div class="v"><code>DONACION WOLFRAM GEMA</code></div>
-          <small>Si el banco permite añadir texto, usa este concepto para facilitar la identificación.</small>
-          <button class="mini-copy" type="button" data-copy="DONACION WOLFRAM GEMA">Copiar concepto</button>
+          <div class="v"><code>DONACION WOLFRAM GEMA · NOMBRE APELLIDOS · DNI/NIF</code></div>
+          <small>Si quieres solicitar la deducción o el certificado fiscal, es importante indicar nombre, apellidos y DNI/NIF en el concepto del pago.</small>
+          <button class="mini-copy" type="button" data-copy="DONACION WOLFRAM GEMA - NOMBRE APELLIDOS - DNI/NIF">Copiar concepto</button>
         </div>
       </div>
       <div class="pagos"><span>Transferencia bancaria</span><span class="bizum-chip"><span class="bizum-icon">Bz</span> Bizum ONG</span></div>
