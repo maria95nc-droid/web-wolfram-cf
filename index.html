@@ -199,6 +199,8 @@
   .dato-pago{background:#f6e8df;border:1px solid var(--borde);border-radius:12px;padding:12px 14px}
   .dato-pago .k{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);margin-bottom:4px}
   .dato-pago .v{font-weight:800;color:var(--tinta);font-size:.98rem;word-break:break-word}
+  .titular-iban{display:block;margin-top:6px;color:var(--suave);font-size:.72rem;line-height:1.35;white-space:nowrap;letter-spacing:-.025em}
+  .dato-pago.transferencia .mini-copy{display:block;width:max-content;margin-top:10px}
   .mini-copy{margin-top:8px;border:0;background:var(--verde);color:#fff;border-radius:9px;padding:8px 12px;font-weight:800;cursor:pointer;font-size:.82rem}
   .mini-copy:hover{background:var(--verdeH)}
   .opciones-metodo{display:grid;gap:8px}
@@ -208,6 +210,10 @@
   .metodo-post-registro button{border:2px solid var(--borde);background:#fff;border-radius:11px;padding:11px 10px;font-family:inherit;font-weight:800;color:var(--tinta);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
   .metodo-post-registro button.activo{border-color:var(--coral);background:#fff5f1;color:var(--coral-hondo)}
   @media (max-width:440px){.metodo-post-registro{grid-template-columns:1fr}}
+  @media (max-width:520px){
+    .titular-iban{font-size:.58rem;letter-spacing:-.04em}
+  }
+
   .resultado-donacion{display:none;background:#f6e8df;border:1px solid var(--borde);border-left:5px solid var(--verde);border-radius:14px;padding:14px 15px;margin-top:14px;color:var(--tinta);font-size:.92rem;line-height:1.45}
   .resultado-donacion strong{font-weight:800}
   .resultado-donacion code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#fff;padding:2px 5px;border-radius:5px}
@@ -307,10 +313,10 @@ const CONFIG = {
       </div>
       <h3>Elige cómo donar</h3>
       <div class="datos-pago" aria-label="Datos para donar">
-        <div class="dato-pago">
+        <div class="dato-pago transferencia">
           <div class="k">Transferencia bancaria</div>
           <div class="v">IBAN: <span id="iban-visible">ES79 0182 1454 1502 0853 7115</span></div>
-          <small>Titular: Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram</small>
+          <small class="titular-iban">Titular: Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram</small>
           <button class="mini-copy" type="button" data-copy="ES7901821454150208537115">Copiar IBAN</button>
         </div>
         <div class="dato-pago">
