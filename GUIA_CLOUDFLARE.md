@@ -100,12 +100,12 @@ Bizum ONG: 02820
 IBAN: ES79 0182 1454 1502 0853 7115
 Titular: Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram
 CIF: G91036087
-Correo certificado fiscal: aswolfram@aswolfram.org
+Correo certificado fiscal: info@aswolfram.org
 ```
 
 ## Texto fiscal
 
-La web indica que no recoge datos personales. Quien necesite certificado fiscal debe escribir a `aswolfram@aswolfram.org` con nombre, DNI/NIF, importe, fecha aproximada y justificante.
+La web indica que no recoge datos personales. Quien necesite certificado fiscal debe escribir a `info@aswolfram.org` con nombre, DNI/NIF, importe, fecha aproximada y justificante.
 
 
 ## Comprobación rápida del panel de administración
