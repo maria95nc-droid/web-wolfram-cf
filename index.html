@@ -385,15 +385,19 @@ const CONFIG = {
     const objetivo = Number(datos.objetivo ?? CONFIG.objetivo) || 1000;
     const recaudado = Number(datos.recaudado ?? CONFIG.recaudado) || 0;
     const donantes = Number(datos.donantes ?? CONFIG.donantes) || 0;
-    const pct = objetivo > 0 ? Math.min(100, Math.round((recaudado / objetivo) * 100)) : 0;
+    const pctReal = objetivo > 0 ? Math.min(100, Math.round((recaudado / objetivo) * 100)) : 0;
+    // Visualmente, importes pequeños como 10 € de 1.000 € son solo un 1%.
+    // Sin este mínimo se ve como un fallo aunque el cálculo sea correcto.
+    // El porcentaje real sigue siendo el correcto; solo damos presencia visual a la barra.
+    const pctVisual = recaudado > 0 && pctReal > 0 ? Math.max(pctReal, 4) : pctReal;
 
     $('recaudado').textContent = eur(recaudado);
     $('objetivo-lbl').textContent = eur(objetivo);
     $('obj-ext').textContent = eur(objetivo);
     $('donantes').textContent = donantes;
     $('fecha').textContent = fechaBonita(datos.actualizado || CONFIG.actualizado);
-    $('relleno').style.width = pct + '%';
-    $('pct').textContent = pct > 8 ? pct + '%' : '';
+    $('relleno').style.width = pctVisual + '%';
+    $('pct').textContent = pctReal > 8 ? pctReal + '%' : '';
     $('objetivo-alcanzado').style.display = recaudado >= objetivo && objetivo > 0 ? 'block' : 'none';
   }
 
