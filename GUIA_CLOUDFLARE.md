@@ -1,55 +1,35 @@
-# Guía de despliegue · AEIASW Donaciones sin Stripe
+# Guía rápida · Web Wolfram simple con barra manual
 
-Esta versión no usa pasarela de pago. El donante **registra su donación**, recibe una **referencia única** y después paga por **Bizum ONG** o **transferencia**.
+## Qué cambia esta versión
 
-## Flujo final
+Esta versión elimina el formulario de donación y los registros individuales.
 
-1. El usuario pulsa **Registrar mi donación**.
-2. Rellena nombre, importe, método, email/DNI opcionales y acepta privacidad.
-3. La web guarda una fila en Supabase con:
-   - `estado = registrada`
-   - `referencia = WG...`
-   - `concepto = DONACION WOLFRAM GEMA WG...`
-4. Solo después del registro, la web muestra:
-   - Bizum ONG: `02820`
-   - IBAN: `ES79 0182 1454 1502 0853 7115`
-   - Titular: Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram
-   - Concepto único para copiar.
-5. El usuario hace Bizum o transferencia.
-6. El usuario pulsa **Ya he realizado la donación**.
-7. La web actualiza la fila a:
-   - `estado = declarada_pagada`
-8. AEIASW revisa banco/Bizum desde `/admin.html`.
-9. Si el ingreso llegó, AEIASW pulsa **Confirmar**.
-10. Entonces la fila pasa a:
-   - `estado = confirmado`
-   - `importe_confirmado = importe recibido`
-   - `confirmado_en = fecha de confirmación`
+La web pública solo muestra:
 
-## Qué muestra la web pública
+- Barra de recaudación manual.
+- Objetivo de 1.000 €.
+- Datos para donar por transferencia bancaria.
+- Código Bizum ONG.
+- Información fiscal y correo de AEIASW para pedir certificado.
 
-La web distingue entre tres niveles:
+El panel privado `/admin.html` permite actualizar desde el móvil:
 
-- **Personas registradas**: rellenaron el formulario y recibieron referencia.
-- **Han marcado pago realizado**: pulsaron “Ya he realizado la donación”.
-- **Confirmadas por AEIASW**: el dinero se verificó en banco/Bizum.
+- Recaudado confirmado.
+- Número de donantes anotados.
+- Objetivo.
 
-El importe en euros solo suma con `estado = confirmado`.
-
-## Archivos principales
+## Archivos importantes
 
 ```txt
 index.html
 admin.html
 og-wolfram.jpg
 01_esquema_supabase.sql
-functions/api/registrar-donacion.js
-functions/api/declarar-donacion-pagada.js
-functions/api/admin/listar-donaciones.js
-functions/api/admin/actualizar-donacion.js
+functions/api/totales-publicos.js
+functions/api/admin/actualizar-campana.js
 ```
 
-## Variables necesarias en Cloudflare
+## Variables de Cloudflare necesarias
 
 En Cloudflare Pages → Settings → Environment variables → Production:
 
@@ -59,86 +39,68 @@ SUPABASE_SERVICE_KEY
 ADMIN_TOKEN
 ```
 
-Opcional:
+No hacen falta variables de Stripe.
+
+## Subir a GitHub
+
+Sube el contenido del ZIP, no la carpeta ni el ZIP entero.
+
+La raíz del repositorio debe quedar así:
 
 ```txt
-RATE_LIMIT_KV
+/index.html
+/admin.html
+/og-wolfram.jpg
+/01_esquema_supabase.sql
+/GUIA_CLOUDFLARE.md
+/functions/api/totales-publicos.js
+/functions/api/admin/actualizar-campana.js
 ```
 
-Ya no hacen falta variables de Stripe.
+## Ejecutar SQL
 
-## Supabase
-
-Ejecuta todo el contenido de:
+En Supabase:
 
 ```txt
-01_esquema_supabase.sql
+SQL Editor → New query → pegar 01_esquema_supabase.sql → Run
 ```
 
-en:
+Esto deja `campaign.objetivo = 1000`.
 
-```txt
-Supabase → SQL Editor → New query → Run
-```
+## Usar el panel admin
 
-Este SQL prepara los estados:
-
-```txt
-registrada
-declarada_pagada
-confirmado
-descartado
-```
-
-También migra automáticamente registros antiguos con `estado = pendiente` a `estado = registrada`.
-
-## Panel privado
-
-URL:
+Abrir:
 
 ```txt
 https://donaciones.aswolfram.org/admin.html
 ```
 
-El panel permite:
+Introducir el `ADMIN_TOKEN`.
 
-- ver todas las donaciones;
-- filtrar por registrada, pago declarado, confirmada o descartada;
-- copiar referencia/concepto;
-- marcar una donación como pago declarado;
-- confirmar una donación recibida;
-- ajustar el importe confirmado;
-- descartar spam, errores o donaciones no recibidas;
-- devolver una fila a registrada.
+Actualizar:
 
-## Prueba obligatoria
+- Recaudado confirmado.
+- Donantes anotados.
+- Objetivo.
 
-1. Despliega la web.
-2. Ejecuta el SQL.
-3. Comprueba que `ADMIN_TOKEN` existe en Cloudflare.
-4. En la web pública registra una donación de prueba de 1 €.
-5. Comprueba que aparece como `registrada` en `/admin.html`.
-6. Comprueba que el contador de personas registradas sube.
-7. En la pantalla final de la web pulsa **Ya he realizado la donación**.
-8. Comprueba que en `/admin.html` pasa a `declarada_pagada`.
-9. En `/admin.html`, pulsa **Confirmar**.
-10. Comprueba que aparece como `confirmado`.
-11. Comprueba que suben:
-    - confirmadas por AEIASW;
-    - euros confirmados.
-12. Descarta o borra la prueba antes del lanzamiento real.
+Guardar.
 
-## Idea clave
+La web pública lee los datos desde:
 
-Este sistema permite movimiento automático y honesto sin Stripe:
+```txt
+/api/totales-publicos
+```
 
-- el usuario registra su donación automáticamente;
-- el usuario declara que ya ha pagado;
-- AEIASW sigue teniendo la última palabra sobre lo realmente confirmado.
+## Datos de donación incluidos
 
-No se debe llamar “confirmada” a una donación hasta que AEIASW haya visto el ingreso real en banco/Bizum.
+```txt
+Bizum ONG: 02820
+IBAN: ES79 0182 1454 1502 0853 7115
+Titular: Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram
+CIF: G91036087
+Correo certificado fiscal: aswolfram@aswolfram.org
+```
 
+## Texto fiscal
 
-## Cambio de Bizum a transferencia tras registrar
-
-La pantalla de datos de pago permite alternar entre Bizum ONG y transferencia sin recargar la página. Cuando el donante pulsa “Ya he realizado la donación”, se guarda también el método final elegido para que el panel admin refleje cómo dice haber pagado.
+La web indica que no recoge datos personales. Quien necesite certificado fiscal debe escribir a `aswolfram@aswolfram.org` con nombre, DNI/NIF, importe, fecha aproximada y justificante.
