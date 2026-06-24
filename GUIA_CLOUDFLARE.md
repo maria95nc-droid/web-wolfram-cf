@@ -1,119 +1,214 @@
-# 🚀 Mudanza a Cloudflare Pages — Guía paso a paso
+# Guía de despliegue · AEIASW donaciones sin pasarela + panel privado
 
-Tu web pasa de Netlify a Cloudflare Pages (más estable, sin pausas por uso).
-El código ya está adaptado. Solo tienes que seguir estos pasos.
+Esta versión **no usa Stripe**. El donante registra su compromiso en la web y después paga por **Bizum ONG** o **transferencia**.
 
-> Lo que cambia respecto a Netlify:
-> - Las funciones ahora están en `/functions/api/` (Cloudflare las detecta solo).
-> - El front llama a `/api/crear-donacion` (ya está cambiado).
-> - Todo lo demás (Supabase, Stripe) es igual.
+Ahora incluye una pantalla privada para que AEIASW confirme pagos sin entrar directamente en el editor de tablas de Supabase.
 
----
+## Cambio principal
 
-## PASO 1 · Subir el código nuevo a GitHub
+La barra principal **no mide euros**.
 
-Tienes dos opciones. La MÁS SIMPLE es crear un repositorio nuevo:
+Ahora mide:
 
-### Opción A — Repositorio nuevo (recomendada, más limpia)
-1. Descomprime este paquete en una carpeta (ej. `web-wolfram-cloudflare`).
-2. Ábrela en VS Code.
-3. En la terminal:
-   ```
-   git init
-   git add .
-   git commit -m "Web para Cloudflare"
-   ```
-4. Crea un repositorio nuevo en github.com (botón "New"), ponle un nombre
-   (ej. `web-wolfram-cf`), NO marques añadir README/gitignore.
-5. Conéctalo y sube (cambia TU_USUARIO):
-   ```
-   git remote add origin https://github.com/TU_USUARIO/web-wolfram-cf.git
-   git branch -M main
-   git push -u origin main
-   ```
+```txt
+Donantes confirmados / objetivo de donantes
+```
 
-### Opción B — Reusar tu repositorio actual
-Si prefieres usar el mismo repo `web-wolfram`, reemplaza los archivos por los de
-este paquete, y haz `git add . && git commit -m "Adaptar a Cloudflare" && git push`.
-(Pero la Opción A es más limpia para no mezclar lo de Netlify.)
+El importe económico queda como dato secundario:
 
----
+```txt
+Euros confirmados
+```
 
-## PASO 2 · Crear cuenta en Cloudflare y conectar GitHub
+Esto evita el problema de los tiempos de transferencia: la barra solo sube cuando AEIASW confirma que el pago llegó de verdad.
 
-1. Entra en **dash.cloudflare.com** → crea una cuenta (gratis) o inicia sesión.
-2. En el menú izquierdo, busca **"Workers & Pages"**.
-3. Pulsa **"Create application"** → pestaña **"Pages"** → **"Connect to Git"**.
-4. Autoriza a Cloudflare a acceder a tu GitHub y elige el repositorio
-   (`web-wolfram-cf` o el que hayas usado).
-5. En la configuración de build:
-   - **Framework preset:** None (ninguno)
-   - **Build command:** déjalo VACÍO
-   - **Build output directory:** déjalo como `/` o vacío
-   (Tu web es HTML simple, no necesita "construirse".)
-6. Pulsa **"Save and Deploy"**.
+## Datos configurados
 
-En 1-2 minutos tendrás tu web en una dirección tipo `web-wolfram-cf.pages.dev`.
+- Asociación: Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram
+- CIF: G91036087
+- Dirección: Picadilly 7, Costacabana, Almería. 04120
+- Bizum ONG: `02820`
+- IBAN: `ES79 0182 1454 1502 0853 7115`
+- Titular: Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram
+- Concepto base: `DONACION WOLFRAM GEMA`
 
----
+No se publica el DNI/NIF personal de la responsable en el HTML público porque no es necesario para el formulario de donación y supone exponer un dato personal.
 
-## PASO 3 · Poner las 4 variables de entorno
+## Flujo público
 
-En Cloudflare → tu proyecto Pages → **Settings** → **Environment variables**
-(o "Variables and Secrets"). Añade estas 4 (en "Production"):
+1. El usuario pulsa **Registrar mi donación**.
+2. Rellena nombre, importe, método y acepta privacidad.
+3. Cloudflare llama a `/api/registrar-donacion`.
+4. Se crea una fila en Supabase con `estado = pendiente`.
+5. La barra principal todavía no sube.
+6. AEIASW revisa banco/Bizum.
+7. AEIASW confirma la donación desde `/admin.html`.
+8. Entonces sube la barra de donantes confirmados y también el importe confirmado.
 
-| Nombre                  | Valor                                          |
-|-------------------------|------------------------------------------------|
-| `STRIPE_SECRET_KEY`     | tu `sk_test_...` (luego la real de AEIASW)      |
-| `STRIPE_WEBHOOK_SECRET` | lo obtienes en el Paso 4                         |
-| `SUPABASE_URL`          | `https://wjdstglnteaegxhgxadh.supabase.co`      |
-| `SUPABASE_SERVICE_KEY`  | tu clave service_role (secreta) de Supabase      |
+## Panel privado cómodo
 
-> Son las MISMAS que ya tenías en Netlify. Cloudflare te deja marcarlas como
-> "secret" (cifradas) — marca como secretas las de Stripe y la service_role.
+URL:
 
-Tras añadirlas, vuelve a desplegar (Deployments → Retry deployment) para que
-las funciones las cojan.
+```txt
+https://donaciones.aswolfram.org/admin.html
+```
 
----
+Ese HTML puede abrirlo cualquiera que conozca la URL, pero **no puede ver ni modificar datos sin el token de administración**.
 
-## PASO 4 · Rehacer el webhook de Stripe con la nueva dirección
+El token se valida en Cloudflare con la variable:
 
-Como la dirección de la web cambia, hay que crear un webhook nuevo apuntando a Cloudflare.
+```txt
+ADMIN_TOKEN
+```
 
-1. En Stripe (modo prueba) → **Desarrolladores → Webhooks → Add endpoint**.
-2. URL del endpoint:
-   ```
-   https://TU-WEB.pages.dev/api/stripe-webhook
-   ```
-   (cambia `TU-WEB.pages.dev` por tu dirección real de Cloudflare)
-3. Evento: `checkout.session.completed`
-4. Crea el endpoint y copia el **Signing secret** (`whsec_...`).
-5. Pégalo en la variable `STRIPE_WEBHOOK_SECRET` de Cloudflare (Paso 3).
-6. Vuelve a desplegar.
+No está escrito en `admin.html` ni en el repositorio.
 
----
+Desde el panel se puede:
 
-## PASO 5 · Probar
+```txt
+- ver pendientes, confirmadas y descartadas
+- copiar el concepto/referencia
+- confirmar una donación recibida
+- cambiar el importe confirmado si llegó una cantidad distinta
+- descartar spam/error/no recibido
+- devolver una donación a pendiente
+```
 
-1. Abre tu web `.pages.dev`, recarga (Ctrl+Shift+R).
-2. Comprueba que la barra carga (lee de Supabase).
-3. Haz una donación de prueba con la tarjeta `4242 4242 4242 4242`.
-4. Comprueba que:
-   - Vuelve a TU web `.pages.dev` (no a otra)
-   - La barra sube sola
-   - En Supabase → `donations` aparece la donación
+## Archivos importantes
 
-Si los 3 puntos van ✅, la mudanza está completa y funcionando.
+```txt
+index.html
+admin.html
+01_esquema_supabase.sql
+functions/api/registrar-donacion.js
+functions/api/admin/listar-donaciones.js
+functions/api/admin/actualizar-donacion.js
+og-wolfram.jpg
+```
 
----
+Las funciones antiguas de Stripe han sido eliminadas.
 
-## Notas
+## Variables necesarias en Cloudflare Pages
 
-- Las funciones de Cloudflare ya verifican la firma de Stripe de forma segura
-  (igual que en Netlify, pero adaptado a este entorno).
-- Tu clave anon de Supabase ya está puesta en el `index.html`.
-- Cuando AEIASW tenga su Stripe real: cambias `STRIPE_SECRET_KEY` y rehaces el
-  webhook (Paso 4) en modo real. Igual que en Netlify.
-- Antes de lanzar: resetea la barra a 0 en Supabase (Table Editor → campaign →
-  pon recaudado_tarjeta y recaudado_manual a 0).
+En Cloudflare Pages → Settings → Environment variables → Production:
+
+```txt
+SUPABASE_URL
+SUPABASE_SERVICE_KEY
+ADMIN_TOKEN
+```
+
+Opcional, pero recomendable:
+
+```txt
+RATE_LIMIT_KV
+```
+
+No hacen falta ya:
+
+```txt
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+```
+
+## Cómo crear ADMIN_TOKEN
+
+Usa una contraseña larga, no una palabra simple. Ejemplo de formato:
+
+```txt
+AEIASW-2026-Wolfram-una-frase-larga-con-numeros-4729
+```
+
+Mejor aún: genera una cadena aleatoria larga y guárdala en un sitio seguro.
+
+Si alguien que no debe tiene el token, cambia `ADMIN_TOKEN` en Cloudflare y redespliega.
+
+## Supabase
+
+1. Ve a Supabase → SQL Editor.
+2. Pega y ejecuta `01_esquema_supabase.sql`.
+3. Comprueba que existen:
+
+```txt
+campaign
+donations
+totales
+```
+
+## Objetivo de donantes
+
+Por defecto queda en:
+
+```txt
+100 donantes confirmados
+```
+
+Para cambiarlo, ejecuta:
+
+```sql
+update public.campaign
+set objetivo_donantes = 150
+where id = 1;
+```
+
+## Confirmar una donación desde el panel
+
+1. Abre `/admin.html`.
+2. Pega el token de administración.
+3. Localiza la donación pendiente.
+4. Revisa en banco/Bizum que el ingreso llegó.
+5. Si llegó, pulsa **Confirmar**.
+6. Si llegó otra cantidad, cambia antes el campo **Confirmado**.
+7. Si no llegó o es spam/error, pulsa **Descartar**.
+
+Cuando confirmas:
+
+```txt
+- estado pasa a confirmado
+- confirmado_en se rellena automáticamente
+- importe_confirmado se guarda
+- sube la barra pública de donantes confirmados
+- sube el importe confirmado
+- deja de contar como pendiente
+```
+
+## Confirmar una donación desde Supabase, si hiciera falta
+
+```sql
+update public.donations
+set estado = 'confirmado',
+    importe_confirmado = coalesce(importe_confirmado, importe),
+    confirmado_en = now()
+where referencia = 'WG260624-XXXXXX';
+```
+
+## Descartar spam o error desde Supabase
+
+```sql
+update public.donations
+set estado = 'descartado',
+    notas = 'No recibido / duplicado / error',
+    importe_confirmado = null,
+    confirmado_en = null
+where referencia = 'WG260624-XXXXXX';
+```
+
+Los registros descartados no cuentan como donantes confirmados ni como euros.
+
+## Prueba obligatoria antes de lanzar
+
+1. Despliega en Cloudflare.
+2. Ejecuta el SQL en Supabase.
+3. Configura `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` y `ADMIN_TOKEN`.
+4. Abre `https://donaciones.aswolfram.org/`.
+5. Registra una donación de prueba de 1 €.
+6. Comprueba que aparece una fila `pendiente` en el panel `/admin.html`.
+7. Comprueba que **no sube** la barra principal todavía.
+8. Confirma esa fila desde el panel.
+9. Comprueba que sube la barra de donantes confirmados.
+10. Comprueba que sube el importe confirmado.
+11. Descarta o borra la prueba antes de publicar masivamente.
+
+## Advertencia técnica
+
+Este sistema elimina comisiones de pasarela, pero no prueba automáticamente que el usuario haya pagado. Por eso la barra principal solo sube con `estado = confirmado`, no simplemente cuando alguien rellena el formulario.

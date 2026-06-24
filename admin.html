@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Administración · Donaciones AEIASW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --crema:#f7f1ea;--card:#fffaf5;--coral:#d9614a;--coral-hondo:#c5503a;
+  --verde:#6f9079;--tinta:#33302d;--suave:#7a7269;--borde:#e9dacc;
+  --ok:#2f7d4f;--warn:#b27521;--bad:#9b2c2c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Nunito Sans",system-ui,sans-serif;background:var(--crema);color:var(--tinta);min-height:100vh}
+.wrap{max-width:1180px;margin:0 auto;padding:26px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
+h1{font-family:"Playfair Display",Georgia,serif;font-size:2rem;line-height:1.1}
+.sub{color:var(--suave);margin-top:6px;line-height:1.45}
+.card{background:var(--card);border:1px solid var(--borde);border-radius:18px;padding:20px;box-shadow:0 8px 28px rgba(120,90,70,.08);margin-bottom:18px}
+.login{max-width:560px;margin:70px auto 0}
+label{display:block;font-weight:800;font-size:.9rem;margin-bottom:7px}
+input,select,textarea{width:100%;border:1px solid var(--borde);border-radius:11px;padding:11px 12px;font:inherit;background:#fff;color:var(--tinta)}
+textarea{min-height:74px;resize:vertical}
+button{border:0;border-radius:11px;padding:11px 14px;font-weight:800;cursor:pointer;background:var(--coral);color:#fff;font:inherit}
+button:hover{background:var(--coral-hondo)}
+button.sec{background:#efe2d6;color:var(--tinta)}
+button.sec:hover{background:#e6d5c4}
+button.ok{background:var(--ok)}
+button.warn{background:var(--warn)}
+button.bad{background:var(--bad)}
+button:disabled{opacity:.55;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.row > *{flex:1 1 180px}
+.small{font-size:.86rem;color:var(--suave);line-height:1.4}
+.msg{display:none;margin-top:12px;padding:11px 13px;border-radius:11px;font-weight:700}
+.msg.ok{display:block;background:#e8f3ec;color:#22593a}
+.msg.err{display:block;background:#f8e2df;color:#8d2c21}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat{background:var(--card);border:1px solid var(--borde);border-radius:16px;padding:17px}
+.stat b{display:block;font-size:1.8rem;line-height:1;color:var(--coral);font-family:"Playfair Display",Georgia,serif}
+.stat span{display:block;color:var(--suave);font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;margin-top:7px}
+.controls{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters button{padding:9px 12px;background:#fff;color:var(--tinta);border:1px solid var(--borde)}
+.filters button.act{background:var(--coral);color:#fff;border-color:var(--coral)}
+.table-wrap{overflow:auto;border:1px solid var(--borde);border-radius:16px;background:#fff}
+table{width:100%;border-collapse:collapse;min-width:1060px;background:#fff}
+th,td{padding:12px;border-bottom:1px solid #f0e5da;text-align:left;vertical-align:top;font-size:.92rem}
+th{background:#fcf3ea;color:#5b5149;font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;position:sticky;top:0;z-index:1}
+tr:last-child td{border-bottom:0}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-weight:800;font-size:.78rem;white-space:nowrap}
+.pendiente{background:#fff0d8;color:#8a5a10}
+.confirmado{background:#dff2e6;color:#1f673c}
+.descartado{background:#f5dddd;color:#8e2525}
+.ref{font-weight:800;font-variant-numeric:tabular-nums}
+.actions{display:flex;gap:7px;flex-wrap:wrap;min-width:245px}
+.actions button{padding:8px 10px;font-size:.82rem}
+.money{font-weight:800;font-variant-numeric:tabular-nums}
+.copy{font-size:.8rem;padding:6px 8px;background:#f0e4d8;color:#463b34}
+.hidden{display:none!important}
+@media(max-width:820px){.stats{grid-template-columns:1fr 1fr}.wrap{padding:18px}header{display:block}table{min-width:980px}}
+@media(max-width:520px){.stats{grid-template-columns:1fr}.login{margin-top:30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="login" class="card login">
+    <h1>Administración de donaciones</h1>
+    <p class="sub">Pantalla privada para confirmar pagos recibidos por Bizum o transferencia. El token no se guarda en el código; se valida contra Cloudflare.</p>
+    <div style="margin-top:18px">
+      <label for="token">Token de administración</label>
+      <input id="token" type="password" autocomplete="current-password" placeholder="Pega aquí el ADMIN_TOKEN">
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button id="entrar">Entrar</button>
+      <button id="borrarToken" class="sec" type="button">Borrar token guardado</button>
+    </div>
+    <div id="loginMsg" class="msg"></div>
+    <p class="small" style="margin-top:14px">No compartas esta página ni el token con personas ajenas a AEIASW. Si se filtra, cambia <b>ADMIN_TOKEN</b> en Cloudflare.</p>
+  </section>
+
+  <main id="panel" class="hidden">
+    <header>
+      <div>
+        <h1>Panel de donaciones</h1>
+        <p class="sub">Confirma solo los pagos que ya aparecen en banco/Bizum. La barra pública sube al cambiar una fila a <b>confirmado</b>.</p>
+      </div>
+      <div class="row" style="flex:0 0 auto">
+        <button id="recargar" class="sec">Recargar</button>
+        <button id="salir" class="bad">Salir</button>
+      </div>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><b id="stConfirmados">0</b><span>confirmados</span></div>
+      <div class="stat"><b id="stPendientes">0</b><span>pendientes</span></div>
+      <div class="stat"><b id="stRecaudado">0 €</b><span>euros confirmados</span></div>
+      <div class="stat"><b id="stObjetivo">100</b><span>objetivo donantes</span></div>
+    </section>
+
+    <section class="card">
+      <div class="controls">
+        <div class="filters">
+          <button data-filter="" class="act">Todas</button>
+          <button data-filter="pendiente">Pendientes</button>
+          <button data-filter="confirmado">Confirmadas</button>
+          <button data-filter="descartado">Descartadas</button>
+        </div>
+        <p id="estadoCarga" class="small">Listo.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Donante</th>
+              <th>Referencia / concepto</th>
+              <th>Método</th>
+              <th>Prometido</th>
+              <th>Confirmado</th>
+              <th>Notas</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="9">Sin datos cargados.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let token = sessionStorage.getItem("ADMIN_TOKEN") || "";
+let filtroActual = "";
+let donaciones = [];
+
+$("token").value = token;
+if (token) mostrarPanel();
+
+$("entrar").addEventListener("click", async () => {
+  token = $("token").value.trim();
+  if (!token) return setMsg("loginMsg", "Introduce el token.", false);
+  sessionStorage.setItem("ADMIN_TOKEN", token);
+  await mostrarPanel();
+});
+
+$("borrarToken").addEventListener("click", () => {
+  sessionStorage.removeItem("ADMIN_TOKEN");
+  $("token").value = "";
+  setMsg("loginMsg", "Token borrado de este navegador.", true);
+});
+
+$("salir").addEventListener("click", () => {
+  sessionStorage.removeItem("ADMIN_TOKEN");
+  token = "";
+  $("panel").classList.add("hidden");
+  $("login").classList.remove("hidden");
+});
+
+$("recargar").addEventListener("click", cargarDonaciones);
+
+document.querySelectorAll(".filters button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filters button").forEach(b => b.classList.remove("act"));
+    btn.classList.add("act");
+    filtroActual = btn.dataset.filter || "";
+    renderTabla();
+  });
+});
+
+async function mostrarPanel(){
+  $("login").classList.add("hidden");
+  $("panel").classList.remove("hidden");
+  await cargarDonaciones();
+}
+
+async function cargarDonaciones(){
+  setEstado("Cargando...");
+  try{
+    const res = await fetch("/api/admin/listar-donaciones?limit=300", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok){
+      if(res.status === 401 || res.status === 403){
+        $("panel").classList.add("hidden");
+        $("login").classList.remove("hidden");
+        sessionStorage.removeItem("ADMIN_TOKEN");
+      }
+      throw new Error(data.error || "No se pudieron cargar las donaciones.");
+    }
+    donaciones = data.donations || [];
+    renderStats(data.totales || null);
+    renderTabla();
+    setEstado(`Cargadas ${donaciones.length} donaciones.`);
+  }catch(e){
+    setEstado(e.message || "Error cargando datos.", true);
+    setMsg("loginMsg", e.message || "Error cargando datos.", false);
+  }
+}
+
+function renderStats(t){
+  const pendientes = t ? Number(t.donantes_pendientes || 0) : donaciones.filter(d => d.estado === "pendiente").length;
+  const confirmados = t ? Number(t.donantes_confirmados || 0) : donaciones.filter(d => d.estado === "confirmado").length;
+  const recaudado = t ? Number(t.recaudado_confirmado || t.recaudado || 0) : donaciones
+    .filter(d => d.estado === "confirmado")
+    .reduce((sum, d) => sum + Number(d.importe_confirmado || d.importe || 0), 0);
+  const objetivo = t ? Number(t.objetivo_donantes || t.objetivo || 100) : 100;
+  $("stConfirmados").textContent = confirmados;
+  $("stPendientes").textContent = pendientes;
+  $("stRecaudado").textContent = euros(recaudado);
+  $("stObjetivo").textContent = objetivo;
+}
+
+function renderTabla(){
+  const rows = filtroActual ? donaciones.filter(d => d.estado === filtroActual) : donaciones;
+  if(!rows.length){
+    $("tbody").innerHTML = `<tr><td colspan="9">No hay donaciones en este filtro.</td></tr>`;
+    return;
+  }
+  $("tbody").innerHTML = rows.map(rowHtml).join("");
+  rows.forEach((d) => {
+    const amountInput = document.querySelector(`[data-amount="${d.id}"]`);
+    const notesInput = document.querySelector(`[data-notes="${d.id}"]`);
+    document.querySelectorAll(`[data-action][data-id="${d.id}"]`).forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const action = btn.dataset.action;
+        const estado = action === "confirmar" ? "confirmado" : action === "descartar" ? "descartado" : "pendiente";
+        const importe_confirmado = amountInput ? amountInput.value : "";
+        const notas = notesInput ? notesInput.value : "";
+        await actualizarDonacion(d.id, estado, importe_confirmado, notas, btn);
+      });
+    });
+    const copyBtn = document.querySelector(`[data-copy="${d.id}"]`);
+    if(copyBtn){
+      copyBtn.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(d.concepto || d.referencia || "");
+        copyBtn.textContent = "Copiado";
+        setTimeout(() => copyBtn.textContent = "Copiar", 1000);
+      });
+    }
+  });
+}
+
+function rowHtml(d){
+  const nombre = d.anonimo ? "Anónimo" : esc(d.nombre || "");
+  const contacto = [d.email, d.dni].filter(Boolean).map(esc).join(" · ");
+  const fecha = d.creado ? new Date(d.creado).toLocaleString("es-ES") : "";
+  const confirmado = d.importe_confirmado ?? d.importe ?? "";
+  const estado = esc(d.estado || "pendiente");
+  return `
+    <tr>
+      <td><span class="badge ${estado}">${estado}</span></td>
+      <td>${esc(fecha)}${d.confirmado_en ? `<div class="small">Confirmado: ${esc(new Date(d.confirmado_en).toLocaleDateString("es-ES"))}</div>` : ""}</td>
+      <td><b>${nombre}</b>${contacto ? `<div class="small">${contacto}</div>` : ""}</td>
+      <td><div class="ref">${esc(d.referencia || "")}</div><div class="small">${esc(d.concepto || "")}</div><button type="button" class="copy" data-copy="${esc(d.id)}">Copiar</button></td>
+      <td>${esc(d.metodo || "")}</td>
+      <td class="money">${euros(d.importe)}</td>
+      <td><input data-amount="${esc(d.id)}" type="number" min="0" step="0.01" value="${esc(String(confirmado ?? ""))}"></td>
+      <td><textarea data-notes="${esc(d.id)}" placeholder="Opcional">${esc(d.notas || "")}</textarea></td>
+      <td class="actions">
+        <button class="ok" data-action="confirmar" data-id="${esc(d.id)}">Confirmar</button>
+        <button class="warn" data-action="pendiente" data-id="${esc(d.id)}">Pendiente</button>
+        <button class="bad" data-action="descartar" data-id="${esc(d.id)}">Descartar</button>
+      </td>
+    </tr>`;
+}
+
+async function actualizarDonacion(id, estado, importe_confirmado, notas, btn){
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Guardando...";
+  setEstado("Actualizando...");
+  try{
+    const res = await fetch("/api/admin/actualizar-donacion", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ id, estado, importe_confirmado, notas })
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok) throw new Error(data.error || "No se pudo actualizar.");
+    await cargarDonaciones();
+    setEstado("Donación actualizada.");
+  }catch(e){
+    setEstado(e.message || "Error actualizando.", true);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = old;
+  }
+}
+
+function euros(n){
+  const value = Number(n || 0);
+  return value.toLocaleString("es-ES", { maximumFractionDigits: 2 }) + " €";
+}
+function esc(v){
+  return String(v ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch]));
+}
+function setEstado(texto, error=false){
+  $("estadoCarga").textContent = texto;
+  $("estadoCarga").style.color = error ? "#9b2c2c" : "#7a7269";
+}
+function setMsg(id, texto, ok){
+  const el = $(id);
+  el.textContent = texto;
+  el.className = "msg " + (ok ? "ok" : "err");
+}
+</script>
+</body>
+</html>

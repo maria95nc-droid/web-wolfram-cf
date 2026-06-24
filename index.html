@@ -90,10 +90,10 @@
     align-items:center;box-shadow:0 6px 30px rgba(120,90,70,.09)}
   .metodo-unico h3{font-size:1.3rem;font-weight:800;margin-bottom:10px}
   .metodo-unico p{color:var(--suave);font-size:1rem;margin-bottom:22px;max-width:400px}
-  .btn-donar-stripe{display:inline-flex;align-items:center;gap:11px;background:var(--coral);color:#fff;
+  .btn-donar-form{display:inline-flex;align-items:center;gap:11px;background:var(--coral);color:#fff;
     border:0;cursor:pointer;font-weight:800;font-size:1.15rem;letter-spacing:.03em;padding:18px 44px;
     border-radius:14px;box-shadow:0 9px 24px rgba(217,97,74,.4);transition:.15s}
-  .btn-donar-stripe:hover{background:var(--coral-hondo);transform:translateY(-2px)}
+  .btn-donar-form:hover{background:var(--coral-hondo);transform:translateY(-2px)}
   .metodo{text-align:center;display:flex;flex-direction:column;align-items:center}
   .ico{width:70px;height:70px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
   .ico svg{width:32px;height:32px}
@@ -186,6 +186,22 @@
     100%{transform:translateY(620px) rotate(360deg);opacity:0}
   }
   @media (prefers-reduced-motion:reduce){ .confeti{display:none} }
+
+
+  /* SISTEMA SIN PASARELA: compromiso + Bizum/transferencia */
+  .datos-pago{width:100%;margin:18px 0 6px;display:grid;gap:10px;text-align:left}
+  .dato-pago{background:#f6e8df;border:1px solid var(--borde);border-radius:12px;padding:12px 14px}
+  .dato-pago .k{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);margin-bottom:4px}
+  .dato-pago .v{font-weight:800;color:var(--tinta);font-size:.98rem;word-break:break-word}
+  .mini-copy{margin-top:8px;border:0;background:var(--verde);color:#fff;border-radius:9px;padding:8px 12px;font-weight:800;cursor:pointer;font-size:.82rem}
+  .mini-copy:hover{background:var(--verdeH)}
+  .opciones-metodo{display:grid;gap:8px}
+  .opciones-metodo label{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--borde);border-radius:11px;padding:11px 12px;cursor:pointer;background:#fff}
+  .opciones-metodo input{margin-top:3px}
+  .resultado-donacion{display:none;background:#f6e8df;border:1px solid var(--borde);border-left:5px solid var(--verde);border-radius:14px;padding:14px 15px;margin-top:14px;color:var(--tinta);font-size:.92rem;line-height:1.45}
+  .resultado-donacion strong{font-weight:800}
+  .resultado-donacion code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#fff;padding:2px 5px;border-radius:5px}
+
 </style>
 </head>
 <body>
@@ -195,9 +211,10 @@
 <!-- =================================================================== -->
 <script>
 const CONFIG = {
-  recaudado: 0,
-  objetivo: 1000,
-  donantes: 0,
+  recaudado_confirmado: 0,
+  objetivo_donantes: 100,
+  donantes_confirmados: 0,
+  donantes_pendientes: 0,
   actualizado: "26 junio 2026"
 };
 </script>
@@ -241,16 +258,18 @@ const CONFIG = {
   <!-- BARRA -->
   <section class="panel">
     <div class="panel-izq">
-      <div class="gran" id="recaudado">0 €</div>
-      <div class="gran-lbl"><span data-i18n="barra.recaudadosDe">recaudados de</span> <span id="obj-lbl">0 €</span> <span id="extra-objetivo" style="display:none;font-weight:700;color:var(--coral)"></span></div>
+      <div class="gran" id="donantes-confirmados">0</div>
+      <div class="gran-lbl"><span>donantes confirmados de</span> <span id="obj-lbl">100</span> <span id="extra-objetivo" style="display:none;font-weight:700;color:var(--coral)"></span></div>
     </div>
     <div>
       <h2 data-i18n-html="barra.titulo">Juntos ya hemos avanzado mucho &#9825;</h2>
       <div class="pista"><div class="relleno" id="relleno"><b id="pct"></b></div></div>
-<div class="extremos" style="justify-content:flex-end"><span id="obj-ext">0 €</span></div>      
-<p id="objetivo-alcanzado" data-i18n="barra.objetivoAlcanzado" style="display:none;margin-top:10px;font-size:.95rem;color:var(--suave)">¡Objetivo alcanzado! Cada donación adicional se sigue destinando íntegramente a la asociación.</p>
+<div class="extremos" style="justify-content:space-between"><span id="inicio-ext">0 donantes</span><span id="obj-ext">100 donantes</span></div>      
+<p id="objetivo-alcanzado" data-i18n="barra.objetivoAlcanzado" style="display:none;margin-top:10px;font-size:.95rem;color:var(--suave)">¡Objetivo de donantes alcanzado! Cada nueva donación sigue ayudando igualmente a la investigación.</p>
 <div class="meta2">
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c2 .4 4 2 4 4.5"/></svg><b id="donantes">0</b>&nbsp;<span data-i18n="barra.personas">personas han colaborado</span></span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c2 .4 4 2 4 4.5"/></svg><b id="pendientes">0</b>&nbsp;<span>pendientes de confirmar</span></span>
+        <span class="div"></span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M2 10h20"/></svg><b id="recaudado-confirmado">0 €</b>&nbsp;<span>confirmados</span></span>
         <span class="div"></span>
         <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span data-i18n="barra.actualizado">Actualizado:</span> <span id="fecha"></span></span>
       </div>
@@ -279,13 +298,18 @@ const CONFIG = {
       <div class="ico" style="background:#d9614a">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
       </div>
-      <h3 data-i18n="ayudar.metodoTitulo">Dona de forma rápida y segura</h3>
-      <p data-i18n-html="ayudar.metodoTexto">Puedes colaborar con <strong>tarjeta</strong> o con <strong>Bizum</strong>, en unos segundos. El pago se procesa de forma cifrada y segura.</p>
-      <button class="btn-donar-stripe" id="btn-donar">
+      <h3>Registra tu donación y paga sin comisiones</h3>
+      <p>Rellena el formulario con tu nombre e importe. Después haz el pago por <strong>Bizum ONG</strong> o <strong>transferencia</strong>. Cuando la asociación confirme el ingreso, subirán la barra de donantes confirmados y el importe recaudado.</p>
+      <div class="datos-pago" aria-label="Datos de pago de AEIASW">
+        <div class="dato-pago"><div class="k">Bizum ONG</div><div class="v">02820</div><button class="mini-copy" type="button" data-copy="02820">Copiar Bizum</button></div>
+        <div class="dato-pago"><div class="k">IBAN</div><div class="v">ES79 0182 1454 1502 0853 7115</div><button class="mini-copy" type="button" data-copy="ES7901821454150208537115">Copiar IBAN</button></div>
+        <div class="dato-pago"><div class="k">Titular</div><div class="v">Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram</div></div>
+      </div>
+      <button class="btn-donar-form" id="btn-donar">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px"><path d="M12 21s-7.5-4.9-10-9.3C.5 8.6 2 5 5.4 5c2 0 3.3 1.1 4.1 2.3C10.3 6.1 11.6 5 13.6 5 17 5 18.5 8.6 17 11.7 14.5 16.1 12 21 12 21z"/></svg>
-        <span data-i18n="ayudar.boton">DONAR AHORA</span>
+        <span>REGISTRAR MI DONACIÓN</span>
       </button>
-      <div class="pagos"><span>VISA</span><span>Mastercard</span><span>Bizum</span><span>&#63743; Pay</span></div>
+      <div class="pagos"><span>Bizum ONG</span><span>Transferencia bancaria</span><span>Sin comisiones de pasarela</span></div>
     </div>
   </section>
 
@@ -315,9 +339,9 @@ const CONFIG = {
 <div class="modal-fondo" id="modal" aria-hidden="true">
   <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-tit">
     <button class="modal-x" id="modal-x" aria-label="Cerrar">&times;</button>
-    <h3 id="modal-tit" data-i18n="modal.titulo">Haz tu donación</h3>
-    <p class="modal-sub" data-i18n="modal.subtitulo">Elige el importe. Después podrás pagar con tarjeta o Bizum.</p>
-    <p id="aviso-objetivo-modal" data-i18n="modal.avisoObjetivo" style="display:none;font-size:.85rem;color:var(--suave);background:var(--crema);border-radius:10px;padding:10px 12px;margin:-4px 0 14px">Ya hemos alcanzado el objetivo inicial. Tu donación seguirá ayudando igualmente a la investigación.</p>
+    <h3 id="modal-tit">Registra tu donación</h3>
+    <p class="modal-sub">Primero registramos tu compromiso. Después haces Bizum ONG o transferencia con el concepto indicado.</p>
+    <p id="aviso-objetivo-modal" style="display:none;font-size:.85rem;color:var(--suave);background:var(--crema);border-radius:10px;padding:10px 12px;margin:-4px 0 14px">Ya hemos alcanzado el objetivo de donantes. Tu donación seguirá ayudando igualmente a la investigación.</p>
 
     <div class="importes" id="importes">
       <button type="button" data-imp="10">10 €</button>
@@ -326,32 +350,48 @@ const CONFIG = {
       <button type="button" data-imp="100">100 €</button>
     </div>
     <div class="campo">
-      <label for="imp-otro" data-i18n="modal.otroImporte">Otro importe (€)</label>
-      <input type="number" id="imp-otro" min="1" step="1" data-i18n-placeholder="modal.otroPlaceholder" placeholder="Ej. 30">
+      <label for="imp-otro">Otro importe (€)</label>
+      <input type="number" id="imp-otro" min="1" step="1" placeholder="Ej. 30">
     </div>
 
     <div class="campo">
-      <label for="d-nombre" data-i18n="modal.nombreLabel">Nombre y apellidos</label>
-      <input type="text" id="d-nombre" maxlength="120" data-i18n-placeholder="modal.nombrePlaceholder" placeholder="Tu nombre">
+      <label for="d-nombre">Nombre y apellidos</label>
+      <input type="text" id="d-nombre" maxlength="120" placeholder="Tu nombre" autocomplete="name">
     </div>
     <div class="campo">
-      <label for="d-email" data-i18n-html="modal.emailLabel">Email <span class="req">(opcional, para enviarte el certificado)</span></label>
-      <input type="email" id="d-email" maxlength="120" placeholder="tu@email.com">
+      <label for="d-email">Email <span class="req">(opcional, para certificado o contacto)</span></label>
+      <input type="email" id="d-email" maxlength="120" placeholder="tu@email.com" autocomplete="email">
     </div>
     <div class="campo">
-      <label for="d-dni" data-i18n-html="modal.dniLabel">DNI <span class="req">(opcional, necesario para poder desgravar)</span></label>
+      <label for="d-dni">DNI/NIF <span class="req">(opcional, necesario para poder desgravar)</span></label>
       <input type="text" id="d-dni" maxlength="20" placeholder="12345678Z">
+    </div>
+
+    <div class="campo">
+      <label>Forma de pago que vas a usar</label>
+      <div class="opciones-metodo">
+        <label><input type="radio" name="d-metodo" value="bizum" checked> <span><strong>Bizum ONG 02820</strong><br><small>Desde tu app bancaria, apartado Bizum / Donar a ONG.</small></span></label>
+        <label><input type="radio" name="d-metodo" value="transferencia"> <span><strong>Transferencia bancaria</strong><br><small>IBAN: ES79 0182 1454 1502 0853 7115</small></span></label>
+      </div>
+    </div>
+
+    <div class="campo campo-check">
+      <label class="check-privacidad">
+        <input type="checkbox" id="d-anonimo">
+        <span>Mostrar mi participación como anónima si se publica algún listado de agradecimientos.</span>
+      </label>
     </div>
 
     <div class="campo campo-check">
       <label class="check-privacidad">
         <input type="checkbox" id="d-acepta-privacidad">
-        <span data-i18n-html="modal.privacidadCheck">He leído y acepto la <a href="#" id="abrir-privacidad">política de privacidad</a>.</span>
+        <span>He leído y acepto la <a href="#" id="abrir-privacidad">política de privacidad</a>.</span>
       </label>
     </div>
 
-    <button class="modal-donar" id="modal-donar" data-i18n="modal.botonContinuar">Continuar al pago seguro →</button>
-    <p class="modal-nota" data-i18n="modal.nota">Pago cifrado y seguro. El DNI es opcional pero necesario si quieres desgravar; el email solo se usa para enviarte el certificado.</p>
+    <button class="modal-donar" id="modal-donar">Registrar compromiso de donación →</button>
+    <p class="modal-nota">No se cobra nada desde esta web. La barra principal sube cuando AEIASW confirma que el ingreso llegó por banco/Bizum.</p>
+    <div class="resultado-donacion" id="resultado-donacion"></div>
   </div>
 </div>
 
@@ -365,370 +405,89 @@ const CONFIG = {
       Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram (AEIASW), CIF G91036087, con dirección en Picadilly 7, Costacabana, Almería, 04120. Email de contacto: <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>.</p>
 
       <p><strong>Finalidad del tratamiento</strong><br>
-      Los datos que nos facilitas (nombre, email y DNI) se utilizan exclusivamente para: gestionar tu donación, emitir el certificado de donación a efectos de la deducción fiscal correspondiente (art. 19, Ley 49/2002), y enviarte comunicaciones relacionadas con tu aportación si lo solicitas.</p>
+      Los datos que facilitas se utilizan para registrar tu compromiso de donación, facilitar la conciliación posterior del ingreso por Bizum ONG o transferencia, contactar contigo si es necesario y, si procede, emitir el certificado de donación.</p>
 
       <p><strong>Base legal</strong><br>
-      El tratamiento se basa en tu consentimiento explícito, otorgado al marcar esta casilla, y en el cumplimiento de obligaciones legales relacionadas con la emisión de certificados fiscales de donación.</p>
+      El tratamiento se basa en tu consentimiento explícito al marcar la casilla correspondiente y en el cumplimiento de obligaciones legales relacionadas con donaciones y certificados fiscales.</p>
 
       <p><strong>Conservación de los datos</strong><br>
-      Tus datos se conservarán durante el tiempo necesario para cumplir con las obligaciones fiscales y contables aplicables, y no más allá de lo legalmente exigido.</p>
+      Tus datos se conservarán durante el tiempo necesario para gestionar la donación y cumplir las obligaciones fiscales, contables y legales aplicables.</p>
 
       <p><strong>Cesión a terceros</strong><br>
-      No cedemos tus datos a terceros, salvo a los proveedores estrictamente necesarios para procesar el pago (pasarela de pago) y alojar la información de forma segura, que actúan como encargados del tratamiento bajo contrato.</p>
+      No se ceden tus datos a terceros salvo obligación legal o proveedores técnicos estrictamente necesarios para alojar la información de forma segura.</p>
 
       <p><strong>Tus derechos</strong><br>
-      Puedes ejercer en cualquier momento tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>. También tienes derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD) si consideras que el tratamiento no se ajusta a la normativa vigente.</p>
+      Puedes ejercer tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>.</p>
     </div>
   </div>
 </div>
 
 <script>
-  const $=id=>document.getElementById(id);
-  const eur=n=>new Intl.NumberFormat('es-ES').format(n)+' €';
+  const $ = (id) => document.getElementById(id);
+  const eur = (n) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Number(n) || 0);
 
-  // ===================================================================
-  //  INTERNACIONALIZACIÓN (i18n): detecta el idioma del dispositivo
-  //  y pinta los textos en español o inglés. Sin selector manual.
-  // ===================================================================
-  const I18N = {
-    es: {
-      header: { donar: "DONAR" },
-      hero: {
-        titulo1: "El 26 de junio es su cumpleaños,",
-        titulo2: "pero el regalo puede cambiar muchas vidas. &#9825;",
-        celebra: "Celebramos el cumpleaños de",
-        rol: "Referente nacional en Síndrome de Wolfram.",
-        cuerpo: "Tu colaboración impulsa la investigación, da visibilidad y acompaña a las familias que conviven cada día con esta enfermedad rara.",
-        boton: "QUIERO COLABORAR"
-      },
-      barra: {
-        recaudadosDe: "recaudados de",
-        objetivoAlcanzado: "¡Objetivo alcanzado! Cada donación adicional se sigue destinando íntegramente a la asociación.",
-        extraObjetivo: "+{x} sobre el objetivo",
-        titulo: "Juntos ya hemos avanzado mucho &#9825;",
-        personas: "personas han colaborado",
-        actualizado: "Actualizado:"
-      },
-      fiscal: {
-        titulo: "Tu donación desgrava en la declaración de la renta",
-        parrafo1: 'La Asociación Síndrome de Wolfram es una <span class="destacar">entidad de utilidad pública</span> acogida a la Ley 49/2002, por lo que Hacienda te devuelve una parte de tu donativo:',
-        parrafo2: '&#8226; El <span class="destacar">80%</span> de los primeros <span class="destacar">250&nbsp;€</span> donados (es decir, por 250&nbsp;€ recuperas 200&nbsp;€).<br>&#8226; El <span class="destacar">40%</span> de la cantidad que supere los 250&nbsp;€.',
-        aviso: '&#9888;&#65039; <strong>Importante:</strong> para que tu donación pueda desgravarse, necesitamos tu <strong>DNI</strong>: sin él, Hacienda no podrá vincular la donación a tu nombre. El <strong>email</strong> es opcional y solo se usa si además quieres que te enviemos el certificado en papel.',
-        nota: "Información orientativa según la normativa estatal vigente (art. 19, Ley 49/2002). Pueden existir deducciones autonómicas adicionales. Consulta tu caso con un asesor si tienes dudas."
-      },
-      ayudar: {
-        titulo: '¿Cómo puedes ayudar? <span style="color:#d9614a">&#9825;</span>',
-        metodoTitulo: "Dona de forma rápida y segura",
-        metodoTexto: "Puedes colaborar con <strong>tarjeta</strong> o con <strong>Bizum</strong>, en unos segundos. El pago se procesa de forma cifrada y segura.",
-        boton: "DONAR AHORA"
-      },
-      causa: {
-        titulo1: "Nuestra causa",
-        texto1: "Investigación, acompañamiento y visibilidad para construir un futuro con más esperanza.",
-        enlace1: "CONOCE MÁS SOBRE EL SÍNDROME DE WOLFRAM →",
-        titulo2: "Transparencia ante todo",
-        texto2: "Publicamos regularmente cómo utilizamos los fondos y el impacto que generamos.",
-        enlace2: "VER INFORMES DE TRANSPARENCIA →"
-      },
-      modal: {
-        titulo: "Haz tu donación",
-        subtitulo: "Elige el importe. Después podrás pagar con tarjeta o Bizum.",
-        avisoObjetivo: "Ya hemos alcanzado el objetivo inicial. Tu donación seguirá ayudando igualmente a la investigación.",
-        otroImporte: "Otro importe (€)",
-        otroPlaceholder: "Ej. 30",
-        nombreLabel: "Nombre y apellidos",
-        nombrePlaceholder: "Tu nombre",
-        emailLabel: 'Email <span class="req">(opcional, para enviarte el certificado)</span>',
-        dniLabel: 'DNI <span class="req">(opcional, necesario para poder desgravar)</span>',
-        privacidadCheck: 'He leído y acepto la <a href="#" id="abrir-privacidad">política de privacidad</a>.',
-        botonContinuar: "Continuar al pago seguro →",
-        nota: "Pago cifrado y seguro. El DNI es opcional pero necesario si quieres desgravar; el email solo se usa para enviarte el certificado."
-      },
-      privacidad: {
-        titulo: "Política de privacidad",
-        cuerpo: `
-          <p><strong>Responsable del tratamiento</strong><br>
-          Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram (AEIASW), CIF G91036087, con dirección en Picadilly 7, Costacabana, Almería, 04120. Email de contacto: <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>.</p>
-          <p><strong>Finalidad del tratamiento</strong><br>
-          Los datos que nos facilitas (nombre, email y DNI) se utilizan exclusivamente para: gestionar tu donación, emitir el certificado de donación a efectos de la deducción fiscal correspondiente (art. 19, Ley 49/2002), y enviarte comunicaciones relacionadas con tu aportación si lo solicitas.</p>
-          <p><strong>Base legal</strong><br>
-          El tratamiento se basa en tu consentimiento explícito, otorgado al marcar esta casilla, y en el cumplimiento de obligaciones legales relacionadas con la emisión de certificados fiscales de donación.</p>
-          <p><strong>Conservación de los datos</strong><br>
-          Tus datos se conservarán durante el tiempo necesario para cumplir con las obligaciones fiscales y contables aplicables, y no más allá de lo legalmente exigido.</p>
-          <p><strong>Cesión a terceros</strong><br>
-          No cedemos tus datos a terceros, salvo a los proveedores estrictamente necesarios para procesar el pago (pasarela de pago) y alojar la información de forma segura, que actúan como encargados del tratamiento bajo contrato.</p>
-          <p><strong>Tus derechos</strong><br>
-          Puedes ejercer en cualquier momento tus derechos de acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>. También tienes derecho a presentar una reclamación ante la Agencia Española de Protección de Datos (AEPD) si consideras que el tratamiento no se ajusta a la normativa vigente.</p>
-        `
-      },
-      alertas: {
-        importeInvalido: "Elige o escribe un importe (mínimo 1 €).",
-        emailInvalido: "Escribe un email válido para enviarte el certificado.",
-        confirmarSinDni: "Vas a donar sin indicar tu DNI. Sin él, no podremos incluir tu donación en la declaración a Hacienda y no podrás desgravarla en la renta.\n\nPulsa Cancelar para volver y añadir tu DNI, o Aceptar para continuar sin desgravación.",
-        privacidadNoAceptada: "Debes aceptar la política de privacidad para continuar.",
-        stripeInactivo: "¡Gracias! El pago con tarjeta y Bizum estará disponible muy pronto.\n\n(Has elegido donar {importe} €. Cuando Stripe esté activo, aquí se abrirá la pasarela de pago.)",
-        conectando: "Conectando con el pago…",
-        errorPago: "No se pudo iniciar el pago: {error}",
-        errorConexion: "Error de conexión con el pago. Inténtalo de nuevo.",
-        gracias: "¡Gracias por tu donación! 💚"
-      }
-    },
-    en: {
-      header: { donar: "DONATE" },
-      hero: {
-        titulo1: "June 26th is her birthday,",
-        titulo2: "but the gift can change many lives. &#9825;",
-        celebra: "Celebrating the birthday of",
-        rol: "National reference in Wolfram Syndrome.",
-        cuerpo: "Your contribution supports research, raises awareness, and stands by the families living with this rare disease every day.",
-        boton: "I WANT TO HELP"
-      },
-      barra: {
-        recaudadosDe: "raised out of",
-        objetivoAlcanzado: "Goal reached! Every additional donation still goes entirely to the association.",
-        extraObjetivo: "+{x} above the goal",
-        titulo: "Together we've already made great progress &#9825;",
-        personas: "people have contributed",
-        actualizado: "Updated:"
-      },
-      fiscal: {
-        titulo: "Your donation is tax-deductible",
-        parrafo1: 'The Wolfram Syndrome Association is a <span class="destacar">public-benefit entity</span> recognized under Spanish Law 49/2002, so the Spanish Tax Agency returns part of your donation:',
-        parrafo2: '&#8226; <span class="destacar">80%</span> of the first <span class="destacar">€250</span> donated (meaning you get back €200 for €250 donated).<br>&#8226; <span class="destacar">40%</span> of any amount above €250.',
-        aviso: '&#9888;&#65039; <strong>Important:</strong> for your donation to be tax-deductible, we need your <strong>ID number</strong>: without it, the tax authorities cannot link the donation to your name. The <strong>email</strong> is optional and only used if you also want us to send you a paper certificate.',
-        nota: "Informational guidance based on current Spanish national regulations (art. 19, Law 49/2002). Additional regional deductions may apply. Consult an advisor if you have questions."
-      },
-      ayudar: {
-        titulo: 'How can you help? <span style="color:#d9614a">&#9825;</span>',
-        metodoTitulo: "Donate quickly and securely",
-        metodoTexto: "You can contribute by <strong>card</strong> or <strong>Bizum</strong>, in just seconds. Payments are processed securely and encrypted.",
-        boton: "DONATE NOW"
-      },
-      causa: {
-        titulo1: "Our cause",
-        texto1: "Research, support, and awareness to build a future with more hope.",
-        enlace1: "LEARN MORE ABOUT WOLFRAM SYNDROME →",
-        titulo2: "Transparency above all",
-        texto2: "We regularly publish how we use funds and the impact we generate.",
-        enlace2: "VIEW TRANSPARENCY REPORTS →"
-      },
-      modal: {
-        titulo: "Make your donation",
-        subtitulo: "Choose the amount. You'll then be able to pay by card or Bizum.",
-        avisoObjetivo: "We've already reached the initial goal. Your donation will still help the research just the same.",
-        otroImporte: "Other amount (€)",
-        otroPlaceholder: "E.g. 30",
-        nombreLabel: "Full name",
-        nombrePlaceholder: "Your name",
-        emailLabel: 'Email <span class="req">(optional, to send you the certificate)</span>',
-        dniLabel: 'ID number <span class="req">(optional, needed to claim the deduction)</span>',
-        privacidadCheck: 'I have read and accept the <a href="#" id="abrir-privacidad">privacy policy</a>.',
-        botonContinuar: "Continue to secure payment →",
-        nota: "Secure, encrypted payment. Your ID number is optional but needed to claim the tax deduction; your email is only used to send you the certificate."
-      },
-      privacidad: {
-        titulo: "Privacy policy",
-        cuerpo: `
-          <p><strong>Data controller</strong><br>
-          Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram (AEIASW), Tax ID G91036087, located at Picadilly 7, Costacabana, Almería, Spain, 04120. Contact email: <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>.</p>
-          <p><strong>Purpose of processing</strong><br>
-          The data you provide (name, email, and ID number) is used exclusively to: manage your donation, issue the donation certificate for the corresponding tax deduction (art. 19, Spanish Law 49/2002), and send you communications related to your contribution if you request them.</p>
-          <p><strong>Legal basis</strong><br>
-          Processing is based on your explicit consent, given by checking this box, and on compliance with legal obligations related to issuing tax donation certificates.</p>
-          <p><strong>Data retention</strong><br>
-          Your data will be kept for as long as necessary to comply with applicable tax and accounting obligations, and no longer than legally required.</p>
-          <p><strong>Disclosure to third parties</strong><br>
-          We do not share your data with third parties, except for providers strictly necessary to process payment (payment gateway) and securely host information, who act as data processors under contract.</p>
-          <p><strong>Your rights</strong><br>
-          You can exercise your rights of access, rectification, erasure, objection, restriction, and portability at any time by writing to <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>. You also have the right to file a complaint with the Spanish Data Protection Agency (AEPD) if you believe the processing does not comply with applicable regulations.</p>
-        `
-      },
-      alertas: {
-        importeInvalido: "Choose or enter an amount (minimum €1).",
-        emailInvalido: "Enter a valid email so we can send you the certificate.",
-        confirmarSinDni: "You're about to donate without your ID number. Without it, we can't report your donation to the tax authorities and you won't be able to claim the deduction.\n\nPress Cancel to go back and add your ID number, or OK to continue without the deduction.",
-        privacidadNoAceptada: "You must accept the privacy policy to continue.",
-        stripeInactivo: "Thank you! Card and Bizum payments will be available very soon.\n\n(You chose to donate €{importe}. Once Stripe is active, the payment gateway will open here.)",
-        conectando: "Connecting to payment…",
-        errorPago: "Payment could not be started: {error}",
-        errorConexion: "Connection error with the payment system. Please try again.",
-        gracias: "Thank you for your donation! 💚"
-      }
-    },
-    it: {
-      header: { donar: "DONA" },
-      hero: {
-        titulo1: "Il 26 giugno è il suo compleanno,",
-        titulo2: "ma il regalo può cambiare molte vite. &#9825;",
-        celebra: "Festeggiamo il compleanno di",
-        rol: "Punto di riferimento nazionale per la Sindrome di Wolfram.",
-        cuerpo: "Il tuo contributo sostiene la ricerca, dà visibilità e accompagna le famiglie che convivono ogni giorno con questa malattia rara.",
-        boton: "VOGLIO AIUTARE"
-      },
-      barra: {
-        recaudadosDe: "raccolti su",
-        objetivoAlcanzado: "Obiettivo raggiunto! Ogni donazione aggiuntiva continua ad andare interamente all'associazione.",
-        extraObjetivo: "+{x} sopra l'obiettivo",
-        titulo: "Insieme abbiamo già fatto molti progressi &#9825;",
-        personas: "persone hanno contribuito",
-        actualizado: "Aggiornato:"
-      },
-      fiscal: {
-        titulo: "La tua donazione è deducibile dalle tasse",
-        parrafo1: 'L\'Associazione Sindrome di Wolfram è un <span class="destacar">ente di pubblica utilità</span> riconosciuto secondo la legge spagnola 49/2002, per cui l\'Agenzia delle Entrate spagnola restituisce parte della tua donazione:',
-        parrafo2: '&#8226; Il <span class="destacar">80%</span> dei primi <span class="destacar">250&nbsp;€</span> donati (cioè, per 250&nbsp;€ recuperi 200&nbsp;€).<br>&#8226; Il <span class="destacar">40%</span> dell\'importo che supera i 250&nbsp;€.',
-        aviso: '&#9888;&#65039; <strong>Importante:</strong> per poter detrarre la tua donazione abbiamo bisogno del tuo <strong>codice fiscale</strong>: senza di esso, il fisco non potrà collegare la donazione al tuo nome. L\'<strong>email</strong> è facoltativa e serve solo se desideri anche ricevere un certificato cartaceo.',
-        nota: "Informazione orientativa secondo la normativa statale spagnola vigente (art. 19, Legge 49/2002). Possono esistere deduzioni regionali aggiuntive. Consulta un consulente in caso di dubbi."
-      },
-      ayudar: {
-        titulo: 'Come puoi aiutare? <span style="color:#d9614a">&#9825;</span>',
-        metodoTitulo: "Dona in modo rapido e sicuro",
-        metodoTexto: "Puoi contribuire con <strong>carta</strong> o con <strong>Bizum</strong>, in pochi secondi. Il pagamento viene elaborato in modo cifrato e sicuro.",
-        boton: "DONA ORA"
-      },
-      causa: {
-        titulo1: "La nostra causa",
-        texto1: "Ricerca, supporto e visibilità per costruire un futuro con più speranza.",
-        enlace1: "SCOPRI DI PIÙ SULLA SINDROME DI WOLFRAM →",
-        titulo2: "Trasparenza prima di tutto",
-        texto2: "Pubblichiamo regolarmente come utilizziamo i fondi e l'impatto che generiamo.",
-        enlace2: "VEDI I REPORT DI TRASPARENZA →"
-      },
-      modal: {
-        titulo: "Effettua la tua donazione",
-        subtitulo: "Scegli l'importo. Dopo potrai pagare con carta o Bizum.",
-        avisoObjetivo: "Abbiamo già raggiunto l'obiettivo iniziale. La tua donazione continuerà comunque ad aiutare la ricerca.",
-        otroImporte: "Altro importo (€)",
-        otroPlaceholder: "Es. 30",
-        nombreLabel: "Nome e cognome",
-        nombrePlaceholder: "Il tuo nome",
-        emailLabel: 'Email <span class="req">(facoltativo, per inviarti il certificato)</span>',
-        dniLabel: 'Documento d\'identità <span class="req">(facoltativo, necessario per la detrazione)</span>',
-        privacidadCheck: 'Ho letto e accetto la <a href="#" id="abrir-privacidad">politica sulla privacy</a>.',
-        botonContinuar: "Continua al pagamento sicuro →",
-        nota: "Pagamento sicuro e cifrato. Il documento d'identità è facoltativo ma necessario per la detrazione fiscale; l'email serve solo per inviarti il certificato."
-      },
-      privacidad: {
-        titulo: "Politica sulla privacy",
-        cuerpo: `
-          <p><strong>Responsabile del trattamento</strong><br>
-          Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram (AEIASW), Codice Fiscale G91036087, con sede in Picadilly 7, Costacabana, Almería, Spagna, 04120. Email di contatto: <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>.</p>
-          <p><strong>Finalità del trattamento</strong><br>
-          I dati che ci fornisci (nome, email e documento d'identità) vengono utilizzati esclusivamente per: gestire la tua donazione, emettere il certificato di donazione ai fini della deduzione fiscale corrispondente (art. 19, Legge spagnola 49/2002), e inviarti comunicazioni relative al tuo contributo se lo richiedi.</p>
-          <p><strong>Base giuridica</strong><br>
-          Il trattamento si basa sul tuo consenso esplicito, fornito selezionando questa casella, e sull'adempimento di obblighi legali relativi all'emissione di certificati fiscali di donazione.</p>
-          <p><strong>Conservazione dei dati</strong><br>
-          I tuoi dati saranno conservati per il tempo necessario ad adempiere agli obblighi fiscali e contabili applicabili, e non oltre quanto legalmente richiesto.</p>
-          <p><strong>Cessione a terzi</strong><br>
-          Non cediamo i tuoi dati a terzi, salvo ai fornitori strettamente necessari per elaborare il pagamento (gateway di pagamento) e ospitare le informazioni in modo sicuro, che agiscono come responsabili del trattamento sotto contratto.</p>
-          <p><strong>I tuoi diritti</strong><br>
-          Puoi esercitare in qualsiasi momento i tuoi diritti di accesso, rettifica, cancellazione, opposizione, limitazione e portabilità scrivendo a <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>. Hai anche il diritto di presentare un reclamo all'Agenzia Spagnola per la Protezione dei Dati (AEPD) se ritieni che il trattamento non sia conforme alla normativa vigente.</p>
-        `
-      },
-      alertas: {
-        importeInvalido: "Scegli o inserisci un importo (minimo 1 €).",
-        emailInvalido: "Inserisci un'email valida per inviarti il certificato.",
-        confirmarSinDni: "Stai per donare senza indicare il tuo codice fiscale. Senza di esso non potremo includere la tua donazione nella dichiarazione al fisco e non potrai detrarla.\n\nPremi Annulla per tornare indietro e aggiungere il codice fiscale, oppure OK per continuare senza detrazione.",
-        privacidadNoAceptada: "Devi accettare la politica sulla privacy per continuare.",
-        stripeInactivo: "Grazie! Il pagamento con carta e Bizum sarà disponibile molto presto.\n\n(Hai scelto di donare {importe} €. Quando Stripe sarà attivo, qui si aprirà il gateway di pagamento.)",
-        conectando: "Connessione al pagamento…",
-        errorPago: "Non è stato possibile avviare il pagamento: {error}",
-        errorConexion: "Errore di connessione con il pagamento. Riprova.",
-        gracias: "Grazie per la tua donazione! 💚"
-      }
-    }
+  const DATOS_PAGO = {
+    bizum: '02820',
+    iban: 'ES79 0182 1454 1502 0853 7115',
+    ibanCompacto: 'ES7901821454150208537115',
+    titular: 'Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram',
+    conceptoBase: 'DONACION WOLFRAM GEMA'
   };
 
-  // Detecta es/en/it a partir del idioma del dispositivo. Cualquier variante
-  // de español (es, es-ES, es-MX...) usa "es"; de italiano (it, it-IT...) usa
-  // "it"; todo lo demás cae en "en" por defecto.
-  const LANG_RAW = (navigator.language || navigator.userLanguage || "es").toLowerCase();
-  const LANG = LANG_RAW.startsWith("es") ? "es" : LANG_RAW.startsWith("it") ? "it" : "en";
-
-  function t(path){
-    const partes = path.split(".");
-    let nodo = I18N[LANG];
-    for(const p of partes){ nodo = nodo && nodo[p]; }
-    return nodo != null ? nodo : path;
-  }
-
-  function aplicarI18n(){
-    document.documentElement.lang = LANG;
-    document.querySelectorAll("[data-i18n]").forEach(el=>{
-      el.textContent = t(el.getAttribute("data-i18n"));
-    });
-    document.querySelectorAll("[data-i18n-html]").forEach(el=>{
-      el.innerHTML = t(el.getAttribute("data-i18n-html"));
-    });
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
-      el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
-    });
-    // El modal de privacidad reasigna su contenido vía innerHTML, lo que
-    // destruye el listener del enlace "abrir-privacidad" si lo hubiera.
-    // Como ese enlace solo existe dentro de modal.privacidadCheck, sus
-    // listeners se vuelven a enganchar más abajo, tras aplicarI18n().
-  }
-  aplicarI18n();
-
-
-
-  // ---------- Confeti de cumpleaños (ligero) ----------
+  // Confeti de cumpleaños ligero
   (function confeti(){
     const cont = $('confeti');
     if(!cont) return;
     if(matchMedia('(prefers-reduced-motion:reduce)').matches) return;
     const colores = ['#d9614a','#8aa893','#f2b705','#e07a63','#a98bb0','#fff'];
-    const N = 22; // pocas piezas: ligero
-    for(let i=0;i<N;i++){
+    for(let i=0;i<22;i++){
       const p = document.createElement('i');
       p.style.left = Math.random()*100 + '%';
       p.style.background = colores[Math.floor(Math.random()*colores.length)];
       p.style.animationDuration = (3.5 + Math.random()*3) + 's';
       p.style.animationDelay = (Math.random()*5) + 's';
-      if(Math.random()>.5) p.style.borderRadius = '50%'; // mezcla círculos y rectángulos
+      if(Math.random()>.5) p.style.borderRadius = '50%';
       p.style.transform = 'rotate('+(Math.random()*360)+'deg)';
       cont.appendChild(p);
     }
   })();
 
-  // ===================================================================
-  //  INTERRUPTOR: pon STRIPE_ACTIVO=true cuando el back esté montado.
-  //  Mientras false, la web funciona pero el pago muestra un aviso.
-  // ===================================================================
-  const STRIPE_ACTIVO = true;
-
-  // Si conectas Supabase para la barra automática, rellena estos 2 datos
-  // y pon BARRA_AUTOMATICA=true. Mientras false, usa las cifras del CONFIG.
   const BARRA_AUTOMATICA = true;
   const SUPABASE_URL = "https://wjdstglnteaegxhgxadh.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqZHN0Z2xudGVhZWd4aGd4YWRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTI2NDUsImV4cCI6MjA5NzEyODY0NX0.-ynUu7wypz2iiDru8D7XedbEP_IwnWirLIaiAgkbsPo";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhcGJhc2UiLCJyZWYiOiJ3amRzdGdsbnRlYWVneGhneGFkaCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzgxNTUyNjQ1LCJleHAiOjIwOTcxMjg2NDV9.-ynUu7wypz2iiDru8D7XedbEP_IwnWirLIaiAgkbsPo";
 
-  // ---------- Pintar la barra ----------
   let OBJETIVO_ALCANZADO = false;
-  function pintarBarra(recaudado, objetivo, donantes, fecha){
-    const pct=Math.min(100,Math.round((recaudado/objetivo)*100)||0);
-    $('recaudado').textContent=eur(recaudado);
-    $('obj-lbl').textContent=eur(objetivo);
-    $('obj-ext').textContent=eur(objetivo);
-    $('donantes').textContent=donantes;
-    // La fecha mostrada es siempre "hoy" (la del dispositivo del visitante),
-    // no la fecha de la última donación que venga de Supabase. Antes se
-    // usaba el parámetro `fecha` (actualizado de la tabla campaign), que
-    // solo cambiaba cuando entraba una donación nueva y por tanto podía
-    // quedarse "congelada" varios días mostrando una fecha pasada.
+  function fechaBonita(iso){
+    try { return new Date(iso).toLocaleDateString('es-ES', { day:'numeric', month:'long', year:'numeric' }); }
+    catch(e) { return iso; }
+  }
+
+  function pintarBarra(datos){
+    const confirmados = Number(datos.donantes_confirmados) || 0;
+    const pendientes = Number(datos.donantes_pendientes) || 0;
+    const objetivoDonantes = Number(datos.objetivo_donantes) || CONFIG.objetivo_donantes || 100;
+    const eurosConfirmados = Number(datos.recaudado_confirmado ?? datos.recaudado) || 0;
+    const pct = Math.min(100, Math.round((confirmados / objetivoDonantes) * 100) || 0);
+
+    $('donantes-confirmados').textContent = confirmados;
+    $('obj-lbl').textContent = objetivoDonantes;
+    $('obj-ext').textContent = objetivoDonantes + ' donantes';
+    $('pendientes').textContent = pendientes;
+    $('recaudado-confirmado').textContent = eur(eurosConfirmados);
     $('fecha').textContent = fechaBonita(new Date());
-    $('pct').textContent = pct>8 ? pct+'%' : '';
-    requestAnimationFrame(()=>{$('relleno').style.width=pct+'%';});
-    OBJETIVO_ALCANZADO = Number(recaudado) >= Number(objetivo) && Number(objetivo) > 0;
+    $('pct').textContent = pct > 8 ? pct + '%' : '';
+    requestAnimationFrame(() => { $('relleno').style.width = pct + '%'; });
+
+    OBJETIVO_ALCANZADO = confirmados >= objetivoDonantes && objetivoDonantes > 0;
     const avisoEl = $('objetivo-alcanzado');
     if(avisoEl) avisoEl.style.display = OBJETIVO_ALCANZADO ? 'block' : 'none';
     const avisoModalEl = $('aviso-objetivo-modal');
     if(avisoModalEl) avisoModalEl.style.display = OBJETIVO_ALCANZADO ? 'block' : 'none';
     const extraEl = $('extra-objetivo');
     if(extraEl){
-      const extra = Number(recaudado) - Number(objetivo);
+      const extra = confirmados - objetivoDonantes;
       if(OBJETIVO_ALCANZADO && extra > 0){
-        extraEl.textContent = t('barra.extraObjetivo').replace('{x}', eur(extra));
+        extraEl.textContent = '+ ' + extra + ' extra';
         extraEl.style.display = 'inline';
       } else {
         extraEl.style.display = 'none';
@@ -739,116 +498,133 @@ const CONFIG = {
   async function cargarBarra(){
     if(BARRA_AUTOMATICA){
       try{
-        const r=await fetch(`${SUPABASE_URL}/rest/v1/totales?select=*`,
-          {headers:{apikey:SUPABASE_ANON_KEY,Authorization:`Bearer ${SUPABASE_ANON_KEY}`}});
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/totales?select=*`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+        });
         if(r.ok){
           const datos = await r.json();
           const t = Array.isArray(datos) ? datos[0] : datos;
-          if(t && t.objetivo){
-            pintarBarra(Number(t.recaudado)||0, Number(t.objetivo)||CONFIG.objetivo, Number(t.donantes)||0, fechaBonita(t.actualizado));
+          if(t){
+            pintarBarra({
+              donantes_confirmados: Number(t.donantes_confirmados ?? t.donantes) || 0,
+              donantes_pendientes: Number(t.donantes_pendientes) || 0,
+              objetivo_donantes: Number(t.objetivo_donantes) || CONFIG.objetivo_donantes,
+              recaudado_confirmado: Number(t.recaudado_confirmado ?? t.recaudado) || 0
+            });
             return;
           }
         }
-        // Si la respuesta no es válida, caemos al modo CONFIG (abajo)
-        console.warn('Barra: respuesta de Supabase vacía o inválida, uso CONFIG.');
-      }catch(e){ console.error('Barra automática falló, uso CONFIG:',e); }
+      }catch(e){ console.error('Barra automática falló, uso CONFIG:', e); }
     }
-    // Modo manual / respaldo: cifras del CONFIG (la barra SIEMPRE se pinta)
-    pintarBarra(CONFIG.recaudado, CONFIG.objetivo, CONFIG.donantes, CONFIG.actualizado);
-  }
-  function fechaBonita(iso){
-    const locale = LANG === 'es' ? 'es-ES' : LANG === 'it' ? 'it-IT' : 'en-GB';
-    try{ return new Date(iso).toLocaleDateString(locale,{day:'numeric',month:'long',year:'numeric'}); }
-    catch(e){ return iso; }
+    pintarBarra(CONFIG);
   }
   cargarBarra();
-  if(BARRA_AUTOMATICA) setInterval(cargarBarra, 15000); // refresca cada 15s
+  if(BARRA_AUTOMATICA) setInterval(cargarBarra, 15000);
 
-  // ---------- Modal ----------
+  // Copiar IBAN/Bizum
+  document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try{
+        await navigator.clipboard.writeText(btn.getAttribute('data-copy'));
+        const original = btn.textContent;
+        btn.textContent = 'Copiado';
+        setTimeout(() => { btn.textContent = original; }, 1400);
+      }catch(e){ alert('No se pudo copiar automáticamente. Copia el dato manualmente.'); }
+    });
+  });
+
+  // Modal
   let importeElegido = 0;
   function abrirModal(){ $('modal').classList.add('abierto'); $('modal').setAttribute('aria-hidden','false'); }
   function cerrarModal(){ $('modal').classList.remove('abierto'); $('modal').setAttribute('aria-hidden','true'); }
+  function abrirPrivacidad(){ $('modal-privacidad').classList.add('abierto'); $('modal-privacidad').setAttribute('aria-hidden','false'); }
+  function cerrarPrivacidad(){ $('modal-privacidad').classList.remove('abierto'); $('modal-privacidad').setAttribute('aria-hidden','true'); }
 
   $('btn-donar').addEventListener('click', abrirModal);
   $('modal-x').addEventListener('click', cerrarModal);
-  $('modal').addEventListener('click', e=>{ if(e.target===$('modal')) cerrarModal(); });
-
-  function abrirPrivacidad(){ $('modal-privacidad').classList.add('abierto'); $('modal-privacidad').setAttribute('aria-hidden','false'); }
-  function cerrarPrivacidad(){ $('modal-privacidad').classList.remove('abierto'); $('modal-privacidad').setAttribute('aria-hidden','true'); }
-  $('abrir-privacidad').addEventListener('click', e=>{ e.preventDefault(); abrirPrivacidad(); });
+  $('modal').addEventListener('click', e => { if(e.target === $('modal')) cerrarModal(); });
+  $('abrir-privacidad').addEventListener('click', e => { e.preventDefault(); abrirPrivacidad(); });
   $('modal-privacidad-x').addEventListener('click', cerrarPrivacidad);
-  $('modal-privacidad').addEventListener('click', e=>{ if(e.target===$('modal-privacidad')) cerrarPrivacidad(); });
+  $('modal-privacidad').addEventListener('click', e => { if(e.target === $('modal-privacidad')) cerrarPrivacidad(); });
 
-  // Selección de importe (botones)
-  document.querySelectorAll('.importes button').forEach(b=>{
-    b.addEventListener('click', ()=>{
-      document.querySelectorAll('.importes button').forEach(x=>x.classList.remove('sel'));
+  document.querySelectorAll('.importes button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.importes button').forEach(x => x.classList.remove('sel'));
       b.classList.add('sel');
       importeElegido = Number(b.dataset.imp);
-      $('imp-otro').value='';
+      $('imp-otro').value = '';
     });
   });
-  // Importe personalizado
-  $('imp-otro').addEventListener('input', ()=>{
-    document.querySelectorAll('.importes button').forEach(x=>x.classList.remove('sel'));
-    importeElegido = Number($('imp-otro').value)||0;
+  $('imp-otro').addEventListener('input', () => {
+    document.querySelectorAll('.importes button').forEach(x => x.classList.remove('sel'));
+    importeElegido = Number($('imp-otro').value) || 0;
   });
 
-  // Botón continuar al pago
-  $('modal-donar').addEventListener('click', async ()=>{
+  function metodoSeleccionado(){
+    const el = document.querySelector('input[name="d-metodo"]:checked');
+    return el ? el.value : 'bizum';
+  }
+
+  function mostrarResultado(data, metodo){
+    const concepto = data.concepto || `${DATOS_PAGO.conceptoBase} ${data.referencia || ''}`.trim();
+    const bloquePago = metodo === 'bizum'
+      ? `<p><strong>Ahora haz el Bizum ONG:</strong><br>Código: <code>${DATOS_PAGO.bizum}</code></p>`
+      : `<p><strong>Ahora haz la transferencia:</strong><br>IBAN: <code>${DATOS_PAGO.iban}</code><br>Titular: ${DATOS_PAGO.titular}</p>`;
+
+    $('resultado-donacion').innerHTML = `
+      <p><strong>Registro recibido.</strong> Tu donación queda pendiente de pago/confirmación.</p>
+      ${bloquePago}
+      <p><strong>Concepto recomendado:</strong><br><code>${concepto}</code></p>
+      <p>Cuando AEIASW confirme el ingreso en banco/Bizum, subirán la barra de donantes confirmados y el importe recaudado.</p>
+    `;
+    $('resultado-donacion').style.display = 'block';
+  }
+
+  $('modal-donar').addEventListener('click', async () => {
     const btn = $('modal-donar');
     const importe = importeElegido;
     const nombre = $('d-nombre').value.trim();
     const email  = $('d-email').value.trim();
     const dni    = $('d-dni').value.trim();
+    const metodo = metodoSeleccionado();
+    const anonimo = $('d-anonimo').checked;
 
-    if(!importe || importe < 1){ alert(t('alertas.importeInvalido')); return; }
-    if(email && !email.includes('@')){ alert(t('alertas.emailInvalido')); return; }
-    if(!$('d-acepta-privacidad').checked){ alert(t('alertas.privacidadNoAceptada')); return; }
+    if(!importe || importe < 1){ alert('Elige o escribe un importe mínimo de 1 €.'); return; }
+    if(importe > 10000){ alert('Importe demasiado alto. Contacta directamente con la asociación.'); return; }
+    if(!nombre){ alert('Escribe tu nombre y apellidos para poder conciliar la donación.'); return; }
+    if(email && !email.includes('@')){ alert('Escribe un email válido.'); return; }
+    if(!$('d-acepta-privacidad').checked){ alert('Debes aceptar la política de privacidad para continuar.'); return; }
 
-    // El DNI es opcional para poder donar, pero sin él Hacienda no puede
-    // vincular la donación al donante y este pierde la deducción fiscal.
-    // En vez de bloquear el campo (lo que reduciría donaciones completas
-    // por fricción), avisamos justo antes de pagar y dejamos que decida
-    // con la información delante, sin obligarle a rellenarlo si no le
-    // importa la desgravación.
     if(!dni){
-      const seguirSinDni = confirm(t('alertas.confirmarSinDni'));
+      const seguirSinDni = confirm('Vas a registrar la donación sin DNI/NIF. Sin este dato puede que no sea posible emitir certificado fiscal a tu nombre.\n\nPulsa Aceptar para continuar o Cancelar para añadirlo.');
       if(!seguirSinDni) return;
     }
 
-    if(!STRIPE_ACTIVO){
-      alert(t('alertas.stripeInactivo').replace('{importe}', importe));
-      return;
-    }
-
-    // Evita doble clic (que crearía dos pagos)
     if(btn.disabled) return;
     btn.disabled = true;
     const textoOrig = btn.textContent;
-    btn.textContent = t('alertas.conectando');
+    btn.textContent = 'Registrando…';
 
-    // Con Stripe activo: llama al back y redirige a la pasarela
     try{
-      const r = await fetch('/api/crear-donacion',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ importe, nombre, email, dni })
+      const r = await fetch('/api/registrar-donacion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ importe, nombre, email, dni, metodo, anonimo })
       });
-      const data = await r.json();
-      if(data.url){ window.location.href = data.url; }
-      else {
-        alert(t('alertas.errorPago').replace('{error}', data.error||'error'));
-        btn.disabled = false; btn.textContent = textoOrig;
+      const data = await r.json().catch(() => ({}));
+      if(!r.ok || !data.ok){
+        throw new Error(data.error || 'No se pudo registrar la donación.');
       }
+      mostrarResultado(data, metodo);
+      await cargarBarra();
+      setTimeout(cargarBarra, 1200);
+      btn.textContent = 'Registrado correctamente';
     }catch(e){
-      alert(t('alertas.errorConexion'));
-      btn.disabled = false; btn.textContent = textoOrig;
+      alert(e.message || 'Error de conexión. Inténtalo de nuevo.');
+      btn.disabled = false;
+      btn.textContent = textoOrig;
     }
   });
-
-  // Mensaje al volver de un pago correcto (Stripe redirige con ?donacion=ok)
-  if(location.search.includes('donacion=ok')){
-setTimeout(()=>alert(t('alertas.gracias')), 400);  }
 </script>
 </body>
 </html>
