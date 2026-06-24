@@ -74,8 +74,9 @@
   .panel h2{font-size:.95rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
   .pista{height:32px;background:#efe2d6;border-radius:999px;overflow:hidden}
   .relleno{height:100%;border-radius:999px;width:0;background:linear-gradient(90deg,var(--coral),var(--coralC));
-    transition:width 1.5s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;justify-content:flex-end}
-  .relleno b{color:#fff;font-weight:800;font-size:1.05rem;padding-right:18px}
+    transition:width 1.5s cubic-bezier(.22,1,.36,1);display:flex;align-items:center;justify-content:center;min-width:0}
+  .relleno.con-texto{min-width:64px}
+  .relleno b{color:#fff;font-weight:800;font-size:1.05rem;padding:0 10px;white-space:nowrap;line-height:1}
   .extremos{display:flex;justify-content:space-between;color:var(--suave);font-size:.92rem;margin-top:9px}
   .meta2{display:flex;align-items:center;gap:24px;margin-top:16px;color:var(--suave);font-size:.95rem;flex-wrap:wrap}
   .meta2 span{display:flex;align-items:center;gap:8px}
@@ -397,8 +398,9 @@ const CONFIG = {
     $('obj-ext').textContent = eur(objetivo);
     $('donantes').textContent = donantes;
     $('fecha').textContent = fechaBonita(datos.actualizado || CONFIG.actualizado);
-    $('relleno').style.width = pctVisual + '%';
-    $('pct').textContent = pctReal > 8 ? pctReal + '%' : '';
+        $('relleno').style.width = pctVisual + '%';
+    $('relleno').classList.toggle('con-texto', pctReal > 0);
+    $('pct').textContent = pctReal > 0 ? pctReal + '%' : '';
     $('objetivo-alcanzado').style.display = recaudado >= objetivo && objetivo > 0 ? 'block' : 'none';
   }
 
