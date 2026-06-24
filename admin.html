@@ -34,9 +34,9 @@
   <h2>Actualizar barra</h2>
   <p class="hint">Introduce los totales reales acumulados. No es una donación nueva: es el total que quieres que se vea en la web.</p>
   <div class="grid" style="margin-top:16px">
-    <div class="field"><label for="recaudado">Recaudado confirmado (€)</label><input type="number" id="recaudado" min="0" step="1"></div>
-    <div class="field"><label for="objetivo">Objetivo (€)</label><input type="number" id="objetivo" min="1" step="1" value="1000"></div>
-    <div class="field"><label for="donantes">Donantes anotados</label><input type="number" id="donantes" min="0" step="1"></div>
+    <div class="field"><label for="recaudado">Recaudado confirmado (€)</label><input type="text" id="recaudado" inputmode="decimal" autocomplete="off" placeholder="Ej. 140"></div>
+    <div class="field"><label for="objetivo">Objetivo (€)</label><input type="text" id="objetivo" inputmode="decimal" autocomplete="off" value="1000" placeholder="Ej. 1000"></div>
+    <div class="field"><label for="donantes">Donantes anotados</label><input type="text" id="donantes" inputmode="numeric" autocomplete="off" placeholder="Ej. 8"></div>
   </div>
   <div class="quick">
     <button class="btn secondary" data-add-euros="10">+10 €</button>
@@ -59,6 +59,15 @@ const fmtEUR = new Intl.NumberFormat('es-ES',{style:'currency',currency:'EUR',ma
 let token = sessionStorage.getItem('wolfram_admin_token') || '';
 const $ = (id)=>document.getElementById(id);
 function fechaES(v){try{return new Date(v).toLocaleDateString('es-ES')}catch{return v||'--'}}
+function leerNumero(id, fallback=0){
+  const raw = String($(id).value || '').trim().replace(',', '.');
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : fallback;
+}
+function leerEntero(id, fallback=0){
+  const n = Math.floor(leerNumero(id, fallback));
+  return Number.isFinite(n) ? n : fallback;
+}
 function msg(id, txt, ok=true){const el=$(id); el.textContent=txt; el.className='msg '+(ok?'ok':'err');}
 function pintar(t){
   $('s-recaudado').textContent = fmtEUR.format(Number(t.recaudado||0));
@@ -83,9 +92,9 @@ async function entrar(){
 }
 async function guardar(){
   const payload = {
-    recaudado: Number($('recaudado').value || 0),
-    objetivo: Number($('objetivo').value || 1000),
-    donantes: Number($('donantes').value || 0)
+    recaudado: leerNumero('recaudado', 0),
+    objetivo: leerNumero('objetivo', 1000),
+    donantes: leerEntero('donantes', 0)
   };
   if(payload.recaudado < 0 || payload.objetivo < 1 || payload.donantes < 0){ msg('save-msg','Revisa los números.',false); return; }
   const r = await fetch('/api/admin/actualizar-campana', {
@@ -99,9 +108,9 @@ async function guardar(){
 }
 document.addEventListener('click', (ev)=>{
   const addE = ev.target.closest('[data-add-euros]');
-  if(addE){ $('recaudado').value = Number($('recaudado').value||0)+Number(addE.dataset.addEuros); return; }
+  if(addE){ $('recaudado').value = leerNumero('recaudado', 0)+Number(addE.dataset.addEuros); return; }
   const addD = ev.target.closest('[data-add-donante]');
-  if(addD){ $('donantes').value = Number($('donantes').value||0)+Number(addD.dataset.addDonante); return; }
+  if(addD){ $('donantes').value = leerEntero('donantes', 0)+Number(addD.dataset.addDonante); return; }
 });
 $('entrar').addEventListener('click', entrar);
 $('guardar').addEventListener('click', guardar);
