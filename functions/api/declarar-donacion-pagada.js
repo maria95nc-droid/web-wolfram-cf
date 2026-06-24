@@ -62,6 +62,8 @@ export async function onRequestPost(context) {
 
     const referencia = limpiarTexto(body.referencia, 40).toUpperCase();
     const publicToken = limpiarTexto(body.public_token, 80);
+    const metodoSolicitado = limpiarTexto(body.metodo, 20).toLowerCase();
+    const metodoFinal = ["bizum", "transferencia"].includes(metodoSolicitado) ? metodoSolicitado : null;
 
     if (!/^WG\d{6}-[A-Z0-9]{1,12}$/.test(referencia) || !publicToken) {
       return json({ error: "Referencia o token no válidos." }, 400, headers);
@@ -77,6 +79,7 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           estado: "declarada_pagada",
           declarado_pagado_en: new Date().toISOString(),
+          ...(metodoFinal ? { metodo: metodoFinal } : {}),
         }),
       }
     );

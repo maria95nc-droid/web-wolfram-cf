@@ -137,3 +137,8 @@ Este sistema permite movimiento automático y honesto sin Stripe:
 - AEIASW sigue teniendo la última palabra sobre lo realmente confirmado.
 
 No se debe llamar “confirmada” a una donación hasta que AEIASW haya visto el ingreso real en banco/Bizum.
+
+
+## Cambio de Bizum a transferencia tras registrar
+
+La pantalla de datos de pago permite alternar entre Bizum ONG y transferencia sin recargar la página. Cuando el donante pulsa “Ya he realizado la donación”, se guarda también el método final elegido para que el panel admin refleje cómo dice haber pagado.

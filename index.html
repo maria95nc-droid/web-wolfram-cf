@@ -198,6 +198,10 @@
   .opciones-metodo{display:grid;gap:8px}
   .opciones-metodo label{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--borde);border-radius:11px;padding:11px 12px;cursor:pointer;background:#fff}
   .opciones-metodo input{margin-top:3px}
+  .metodo-post-registro{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+  .metodo-post-registro button{border:2px solid var(--borde);background:#fff;border-radius:11px;padding:11px 10px;font-family:inherit;font-weight:800;color:var(--tinta);cursor:pointer}
+  .metodo-post-registro button.activo{border-color:var(--coral);background:#fff5f1;color:var(--coral-hondo)}
+  @media (max-width:440px){.metodo-post-registro{grid-template-columns:1fr}}
   .resultado-donacion{display:none;background:#f6e8df;border:1px solid var(--borde);border-left:5px solid var(--verde);border-radius:14px;padding:14px 15px;margin-top:14px;color:var(--tinta);font-size:.92rem;line-height:1.45}
   .resultado-donacion strong{font-weight:800}
   .resultado-donacion code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#fff;padding:2px 5px;border-radius:5px}
@@ -312,7 +316,7 @@ const CONFIG = {
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px"><path d="M12 21s-7.5-4.9-10-9.3C.5 8.6 2 5 5.4 5c2 0 3.3 1.1 4.1 2.3C10.3 6.1 11.6 5 13.6 5 17 5 18.5 8.6 17 11.7 14.5 16.1 12 21 12 21z"/></svg>
         <span>REGISTRAR MI DONACIÓN</span>
       </button>
-      <div class="pagos"><span>Bizum ONG</span><span>Transferencia bancaria</span><span>Sin comisiones de pasarela</span></div>
+      <div class="pagos"><span>Bizum ONG</span><span>Transferencia bancaria</span></div>
     </div>
   </section>
 
@@ -577,27 +581,59 @@ const CONFIG = {
   }
 
   let ultimaDonacionRegistrada = null;
+  let metodoPagoFinal = 'bizum';
+
+  function bloquePagoParaMetodo(metodo){
+    if(metodo === 'transferencia'){
+      return `
+        <div class="dato-pago"><div class="k">IBAN</div><div class="v">${DATOS_PAGO.iban}</div><button class="mini-copy" type="button" data-copy="ES7901821454150208537115">Copiar IBAN</button></div>
+        <div class="dato-pago"><div class="k">Titular</div><div class="v">${DATOS_PAGO.titular}</div></div>
+      `;
+    }
+    return `<div class="dato-pago"><div class="k">Bizum ONG</div><div class="v">${DATOS_PAGO.bizum}</div><button class="mini-copy" type="button" data-copy="${DATOS_PAGO.bizum}">Copiar Bizum</button></div>`;
+  }
+
+  function pintarDatosPagoFinal(){
+    if(!ultimaDonacionRegistrada) return;
+    const concepto = ultimaDonacionRegistrada.concepto || `${DATOS_PAGO.conceptoBase} ${ultimaDonacionRegistrada.referencia || ''}`.trim();
+    const contenedor = $('datos-pago-final');
+    if(!contenedor) return;
+    contenedor.innerHTML = `
+      ${bloquePagoParaMetodo(metodoPagoFinal)}
+      <div class="dato-pago"><div class="k">Importe</div><div class="v">${eur(ultimaDonacionRegistrada.importe)}</div></div>
+      <div class="dato-pago"><div class="k">Concepto obligatorio</div><div class="v"><code>${concepto}</code></div><button class="mini-copy" type="button" data-copy="${concepto.replace(/"/g, '&quot;')}">Copiar concepto</button></div>
+    `;
+    document.querySelectorAll('.metodo-post-registro button').forEach(btn => {
+      btn.classList.toggle('activo', btn.dataset.metodoFinal === metodoPagoFinal);
+    });
+    activarBotonesCopiar(contenedor);
+  }
 
   function mostrarResultado(data, metodo){
     ultimaDonacionRegistrada = data;
-    const concepto = data.concepto || `${DATOS_PAGO.conceptoBase} ${data.referencia || ''}`.trim();
-    const bloquePago = metodo === 'bizum'
-      ? `<div class="dato-pago"><div class="k">Bizum ONG</div><div class="v">${DATOS_PAGO.bizum}</div><button class="mini-copy" type="button" data-copy="${DATOS_PAGO.bizum}">Copiar Bizum</button></div>`
-      : `<div class="dato-pago"><div class="k">IBAN</div><div class="v">${DATOS_PAGO.iban}</div><button class="mini-copy" type="button" data-copy="ES7901821454150208537115">Copiar IBAN</button></div><div class="dato-pago"><div class="k">Titular</div><div class="v">${DATOS_PAGO.titular}</div></div>`;
+    metodoPagoFinal = metodo === 'transferencia' ? 'transferencia' : 'bizum';
 
     $('resultado-donacion').innerHTML = `
-      <p><strong>Registro recibido.</strong> Ahora realiza el Bizum o la transferencia con estos datos.</p>
-      <div class="datos-pago">
-        ${bloquePago}
-        <div class="dato-pago"><div class="k">Importe</div><div class="v">${eur(data.importe)}</div></div>
-        <div class="dato-pago"><div class="k">Concepto obligatorio</div><div class="v"><code>${concepto}</code></div><button class="mini-copy" type="button" data-copy="${concepto.replace(/"/g, '&quot;')}">Copiar concepto</button></div>
+      <p><strong>Registro recibido.</strong> Elige ahora cómo vas a hacer la donación. Puedes cambiar entre Bizum y transferencia sin recargar la página.</p>
+      <div class="metodo-post-registro" aria-label="Elegir método final de pago">
+        <button type="button" data-metodo-final="bizum">Bizum ONG</button>
+        <button type="button" data-metodo-final="transferencia">Transferencia bancaria</button>
       </div>
+      <div class="datos-pago" id="datos-pago-final"></div>
       <p>Cuando hayas hecho el Bizum o la transferencia, pulsa este botón para dejar constancia. AEIASW lo verificará después en banco/Bizum.</p>
       <button type="button" class="modal-donar" id="btn-declarar-pagada">Ya he realizado la donación</button>
       <p id="estado-declaracion" class="modal-nota">Aún no está confirmada por AEIASW. Quedará pendiente de verificación.</p>
     `;
     $('resultado-donacion').style.display = 'block';
-    activarBotonesCopiar($('resultado-donacion'));
+
+    document.querySelectorAll('.metodo-post-registro button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        metodoPagoFinal = btn.dataset.metodoFinal === 'transferencia' ? 'transferencia' : 'bizum';
+        pintarDatosPagoFinal();
+      });
+    });
+
+    pintarDatosPagoFinal();
     const declararBtn = $('btn-declarar-pagada');
     if(declararBtn) declararBtn.addEventListener('click', declararDonacionPagada);
   }
@@ -619,7 +655,8 @@ const CONFIG = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           referencia: ultimaDonacionRegistrada.referencia,
-          public_token: ultimaDonacionRegistrada.public_token
+          public_token: ultimaDonacionRegistrada.public_token,
+          metodo: metodoPagoFinal
         })
       });
       const data = await r.json().catch(() => ({}));
