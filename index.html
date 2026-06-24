@@ -195,12 +195,12 @@
 
 
   /* SISTEMA SIN PASARELA: compromiso + Bizum/transferencia */
-  .datos-pago{width:100%;margin:18px 0 6px;display:grid;gap:10px;text-align:left}
-  .dato-pago{background:#f6e8df;border:1px solid var(--borde);border-radius:12px;padding:12px 14px}
+  .datos-pago{width:100%;max-width:100%;margin:18px auto 6px;display:grid;gap:12px;text-align:left;align-items:stretch}
+  .dato-pago{background:#f6e8df;border:1px solid var(--borde);border-radius:12px;padding:12px 14px;width:100%;max-width:100%;min-width:0;overflow:hidden}
   .dato-pago .k{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--suave);margin-bottom:4px}
   .dato-pago .v{font-weight:800;color:var(--tinta);font-size:.98rem;word-break:break-word}
-  .titular-iban{display:block;margin-top:6px;color:var(--suave);font-size:.72rem;line-height:1.35;white-space:nowrap;letter-spacing:-.025em}
-  .dato-pago.transferencia .mini-copy{display:block;width:max-content;margin-top:10px}
+  .titular-iban{display:block;margin-top:7px;color:var(--suave);font-size:.76rem;line-height:1.35;white-space:nowrap;letter-spacing:-.035em;max-width:100%}
+  .dato-pago.transferencia .mini-copy{display:block;width:max-content;margin-top:12px}
   .mini-copy{margin-top:8px;border:0;background:var(--verde);color:#fff;border-radius:9px;padding:8px 12px;font-weight:800;cursor:pointer;font-size:.82rem}
   .mini-copy:hover{background:var(--verdeH)}
   .opciones-metodo{display:grid;gap:8px}
@@ -211,7 +211,13 @@
   .metodo-post-registro button.activo{border-color:var(--coral);background:#fff5f1;color:var(--coral-hondo)}
   @media (max-width:440px){.metodo-post-registro{grid-template-columns:1fr}}
   @media (max-width:520px){
-    .titular-iban{font-size:.58rem;letter-spacing:-.04em}
+    .metodo-unico{padding-left:26px;padding-right:26px}
+    .datos-pago{gap:12px}
+    .dato-pago{border-radius:13px}
+    .titular-iban{font-size:.62rem;letter-spacing:-.055em;line-height:1.35}
+  }
+  @media (max-width:370px){
+    .titular-iban{font-size:.58rem;letter-spacing:-.06em}
   }
 
   .resultado-donacion{display:none;background:#f6e8df;border:1px solid var(--borde);border-left:5px solid var(--verde);border-radius:14px;padding:14px 15px;margin-top:14px;color:var(--tinta);font-size:.92rem;line-height:1.45}
