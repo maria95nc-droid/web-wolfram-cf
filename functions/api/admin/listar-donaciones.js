@@ -52,11 +52,11 @@ export async function onRequestGet(context) {
 
     let query =
       `${env.SUPABASE_URL}/rest/v1/donations` +
-      `?select=id,referencia,creado,nombre,email,dni,metodo,importe,importe_confirmado,estado,concepto,anonimo,notas,confirmado_en` +
+      `?select=id,referencia,creado,nombre,email,dni,metodo,importe,importe_confirmado,estado,concepto,anonimo,notas,declarado_pagado_en,confirmado_en` +
       `&order=creado.desc` +
       `&limit=${limite}`;
 
-    if (["pendiente", "confirmado", "descartado"].includes(estado)) {
+    if (["registrada", "declarada_pagada", "confirmado", "descartado"].includes(estado)) {
       query += `&estado=eq.${encodeURIComponent(estado)}`;
     }
 

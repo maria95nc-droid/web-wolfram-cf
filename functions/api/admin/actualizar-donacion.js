@@ -13,7 +13,7 @@ const ORIGENES_PERMITIDOS = [
   "https://www.aswolfram.org",
 ];
 
-const ESTADOS_VALIDOS = ["pendiente", "confirmado", "descartado"];
+const ESTADOS_VALIDOS = ["registrada", "declarada_pagada", "confirmado", "descartado"];
 
 function corsHeaders(request) {
   const origen = request.headers.get("origin");
@@ -62,7 +62,7 @@ export async function onRequestPost(context) {
     }
 
     const rowRes = await fetch(
-      `${env.SUPABASE_URL}/rest/v1/donations?id=eq.${encodeURIComponent(id)}&select=id,importe,estado`,
+      `${env.SUPABASE_URL}/rest/v1/donations?id=eq.${encodeURIComponent(id)}&select=id,importe,estado,declarado_pagado_en`,
       { headers: supabaseHeaders(env) }
     );
 
@@ -93,9 +93,14 @@ export async function onRequestPost(context) {
 
       patch.importe_confirmado = importeConfirmado;
       patch.confirmado_en = new Date().toISOString();
-    } else if (estado === "pendiente") {
+    } else if (estado === "registrada") {
       patch.importe_confirmado = null;
       patch.confirmado_en = null;
+      patch.declarado_pagado_en = null;
+    } else if (estado === "declarada_pagada") {
+      patch.importe_confirmado = null;
+      patch.confirmado_en = null;
+      if (!donacion.declarado_pagado_en) patch.declarado_pagado_en = new Date().toISOString();
     } else if (estado === "descartado") {
       patch.importe_confirmado = null;
       patch.confirmado_en = null;

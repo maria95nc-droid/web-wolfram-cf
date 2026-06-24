@@ -1,11 +1,11 @@
 // ============================================================
-//  Registrar compromiso de donación — CLOUDFLARE PAGES
+//  Registrar donación — CLOUDFLARE PAGES
 //  Ruta pública: /api/registrar-donacion
 //
-//  No cobra dinero. Guarda una fila en Supabase con estado "pendiente".
-//  El registro aparece como pendiente. La barra principal de donantes y
-//  el importe solo suben cuando AEIASW confirme el ingreso cambiando
-//  estado a "confirmado".
+//  No cobra dinero. Guarda una fila en Supabase con estado "registrada".
+//  Después se muestran Bizum/IBAN/concepto. Si el usuario pulsa
+//  "Ya he realizado la donación", otra función cambia el estado a
+//  "declarada_pagada". AEIASW confirma manualmente el ingreso real.
 // ============================================================
 
 const ORIGENES_PERMITIDOS = [
@@ -31,6 +31,7 @@ function corsHeaders(request) {
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Content-Type": "application/json; charset=utf-8",
     "Vary": "Origin",
+    "Cache-Control": "no-store",
   };
 }
 
@@ -48,7 +49,6 @@ export async function onRequestPost(context) {
     }
 
     // Rate limit básico por IP: evita spam evidente sin bloquear la campaña.
-    // Requiere KV RATE_LIMIT_KV. Si no está enlazado, la función sigue funcionando.
     if (env.RATE_LIMIT_KV) {
       const ip = context.request.headers.get("CF-Connecting-IP") || "desconocida";
       const clave = `registrar:${ip}`;
@@ -90,23 +90,25 @@ export async function onRequestPost(context) {
     if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       return json({ error: "Email no válido." }, 400, headers);
     }
-    if (!['bizum', 'transferencia'].includes(metodo)) {
+    if (!["bizum", "transferencia"].includes(metodo)) {
       return json({ error: "Método de pago no válido." }, 400, headers);
     }
 
     const referencia = generarReferencia();
+    const publicToken = generarTokenPublico();
     const concepto = `${DATOS_PAGO.conceptoBase} ${referencia}`;
 
     const payload = {
       importe,
       metodo,
-      estado: "pendiente",
+      estado: "registrada",
       nombre,
       email: email || null,
       dni: dni || null,
       anonimo,
       referencia,
       concepto,
+      public_token: publicToken,
     };
 
     const supabaseRes = await fetch(`${env.SUPABASE_URL}/rest/v1/donations`, {
@@ -127,8 +129,9 @@ export async function onRequestPost(context) {
 
     return json({
       ok: true,
-      estado: "pendiente",
+      estado: "registrada",
       referencia,
+      public_token: publicToken,
       concepto,
       metodo,
       importe,
@@ -155,8 +158,19 @@ function generarReferencia() {
   const y = String(fecha.getUTCFullYear()).slice(-2);
   const m = String(fecha.getUTCMonth() + 1).padStart(2, "0");
   const d = String(fecha.getUTCDate()).padStart(2, "0");
-  const aleatorio = crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase().slice(0, 6);
+  const aleatorio = crypto.getRandomValues(new Uint32Array(1))[0]
+    .toString(36)
+    .toUpperCase()
+    .padStart(6, "0")
+    .slice(0, 6);
   return `WG${y}${m}${d}-${aleatorio}`;
+}
+
+function generarTokenPublico() {
+  if (crypto.randomUUID) return crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 function json(data, status, headers) {

@@ -213,8 +213,9 @@
 const CONFIG = {
   recaudado_confirmado: 0,
   objetivo_donantes: 100,
+  registros_total: 0,
+  donantes_declarados: 0,
   donantes_confirmados: 0,
-  donantes_pendientes: 0,
   actualizado: "26 junio 2026"
 };
 </script>
@@ -255,23 +256,25 @@ const CONFIG = {
     </div>
   </section>
 
-  <!-- BARRA -->
+  <!-- CONTADOR DE COMUNIDAD -->
   <section class="panel">
     <div class="panel-izq">
-      <div class="gran" id="donantes-confirmados">0</div>
-      <div class="gran-lbl"><span>donantes confirmados de</span> <span id="obj-lbl">100</span> <span id="extra-objetivo" style="display:none;font-weight:700;color:var(--coral)"></span></div>
+      <div class="gran" id="registros-total">0</div>
+      <div class="gran-lbl"><span>personas registradas de</span> <span id="obj-lbl">100</span> <span id="extra-objetivo" style="display:none;font-weight:700;color:var(--coral)"></span></div>
     </div>
     <div>
-      <h2 data-i18n-html="barra.titulo">Juntos ya hemos avanzado mucho &#9825;</h2>
+      <h2>Juntos ya somos más personas ayudando &#9825;</h2>
       <div class="pista"><div class="relleno" id="relleno"><b id="pct"></b></div></div>
-<div class="extremos" style="justify-content:space-between"><span id="inicio-ext">0 donantes</span><span id="obj-ext">100 donantes</span></div>      
-<p id="objetivo-alcanzado" data-i18n="barra.objetivoAlcanzado" style="display:none;margin-top:10px;font-size:.95rem;color:var(--suave)">¡Objetivo de donantes alcanzado! Cada nueva donación sigue ayudando igualmente a la investigación.</p>
-<div class="meta2">
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c2 .4 4 2 4 4.5"/></svg><b id="pendientes">0</b>&nbsp;<span>pendientes de confirmar</span></span>
+      <div class="extremos" style="justify-content:space-between"><span id="inicio-ext">0 registros</span><span id="obj-ext">100 registros</span></div>
+      <p id="objetivo-alcanzado" style="display:none;margin-top:10px;font-size:.95rem;color:var(--suave)">¡Objetivo de personas registradas alcanzado! Cada nueva donación sigue ayudando igualmente a la investigación.</p>
+      <div class="meta2">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5c2 .4 4 2 4 4.5"/></svg><b id="declarados-pago">0</b>&nbsp;<span>han marcado pago realizado</span></span>
+        <span class="div"></span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><b id="confirmados-aeiasw">0</b>&nbsp;<span>confirmadas por AEIASW</span></span>
         <span class="div"></span>
         <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M2 10h20"/></svg><b id="recaudado-confirmado">0 €</b>&nbsp;<span>confirmados</span></span>
         <span class="div"></span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span data-i18n="barra.actualizado">Actualizado:</span> <span id="fecha"></span></span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="#6f9079" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span>Actualizado: </span><b id="fecha">26 junio 2026</b></span>
       </div>
     </div>
   </section>
@@ -298,12 +301,12 @@ const CONFIG = {
       <div class="ico" style="background:#d9614a">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
       </div>
-      <h3>Registra tu donación y paga sin comisiones</h3>
-      <p>Rellena el formulario con tu nombre e importe. Después haz el pago por <strong>Bizum ONG</strong> o <strong>transferencia</strong>. Cuando la asociación confirme el ingreso, subirán la barra de donantes confirmados y el importe recaudado.</p>
-      <div class="datos-pago" aria-label="Datos de pago de AEIASW">
-        <div class="dato-pago"><div class="k">Bizum ONG</div><div class="v">02820</div><button class="mini-copy" type="button" data-copy="02820">Copiar Bizum</button></div>
-        <div class="dato-pago"><div class="k">IBAN</div><div class="v">ES79 0182 1454 1502 0853 7115</div><button class="mini-copy" type="button" data-copy="ES7901821454150208537115">Copiar IBAN</button></div>
-        <div class="dato-pago"><div class="k">Titular</div><div class="v">Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram</div></div>
+      <h3>Registra tu donación y recibe tu referencia</h3>
+      <p>Primero rellena el formulario con tu nombre, importe y método. Después la web te dará el <strong>Bizum ONG</strong>, el <strong>IBAN</strong> y un <strong>concepto único</strong> para que AEIASW pueda identificar tu aportación.</p>
+      <div class="datos-pago" aria-label="Pasos para donar">
+        <div class="dato-pago"><div class="k">Paso 1</div><div class="v">Registra tu donación.</div></div>
+        <div class="dato-pago"><div class="k">Paso 2</div><div class="v">Recibe referencia, Bizum ONG, IBAN y concepto.</div></div>
+        <div class="dato-pago"><div class="k">Paso 3</div><div class="v">Haz Bizum o transferencia y pulsa “Ya he realizado la donación”.</div></div>
       </div>
       <button class="btn-donar-form" id="btn-donar">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px"><path d="M12 21s-7.5-4.9-10-9.3C.5 8.6 2 5 5.4 5c2 0 3.3 1.1 4.1 2.3C10.3 6.1 11.6 5 13.6 5 17 5 18.5 8.6 17 11.7 14.5 16.1 12 21 12 21z"/></svg>
@@ -340,8 +343,8 @@ const CONFIG = {
   <div class="modal-caja" role="dialog" aria-modal="true" aria-labelledby="modal-tit">
     <button class="modal-x" id="modal-x" aria-label="Cerrar">&times;</button>
     <h3 id="modal-tit">Registra tu donación</h3>
-    <p class="modal-sub">Primero registramos tu compromiso. Después haces Bizum ONG o transferencia con el concepto indicado.</p>
-    <p id="aviso-objetivo-modal" style="display:none;font-size:.85rem;color:var(--suave);background:var(--crema);border-radius:10px;padding:10px 12px;margin:-4px 0 14px">Ya hemos alcanzado el objetivo de donantes. Tu donación seguirá ayudando igualmente a la investigación.</p>
+    <p class="modal-sub">Primero registramos tu donación. Después te mostramos Bizum ONG, IBAN y un concepto único para pagar.</p>
+    <p id="aviso-objetivo-modal" style="display:none;font-size:.85rem;color:var(--suave);background:var(--crema);border-radius:10px;padding:10px 12px;margin:-4px 0 14px">Ya hemos alcanzado el objetivo de registros. Tu donación seguirá ayudando igualmente a la investigación.</p>
 
     <div class="importes" id="importes">
       <button type="button" data-imp="10">10 €</button>
@@ -370,8 +373,8 @@ const CONFIG = {
     <div class="campo">
       <label>Forma de pago que vas a usar</label>
       <div class="opciones-metodo">
-        <label><input type="radio" name="d-metodo" value="bizum" checked> <span><strong>Bizum ONG 02820</strong><br><small>Desde tu app bancaria, apartado Bizum / Donar a ONG.</small></span></label>
-        <label><input type="radio" name="d-metodo" value="transferencia"> <span><strong>Transferencia bancaria</strong><br><small>IBAN: ES79 0182 1454 1502 0853 7115</small></span></label>
+        <label><input type="radio" name="d-metodo" value="bizum" checked> <span><strong>Bizum ONG</strong><br><small>Te mostraremos el código después de registrar tu donación.</small></span></label>
+        <label><input type="radio" name="d-metodo" value="transferencia"> <span><strong>Transferencia bancaria</strong><br><small>Te mostraremos el IBAN y el concepto único después de registrar tu donación.</small></span></label>
       </div>
     </div>
 
@@ -389,8 +392,8 @@ const CONFIG = {
       </label>
     </div>
 
-    <button class="modal-donar" id="modal-donar">Registrar compromiso de donación →</button>
-    <p class="modal-nota">No se cobra nada desde esta web. La barra principal sube cuando AEIASW confirma que el ingreso llegó por banco/Bizum.</p>
+    <button class="modal-donar" id="modal-donar">Generar referencia y datos de pago →</button>
+    <p class="modal-nota">No se cobra nada desde esta web. El contador de registros sube al guardar tu donación; el importe solo cuenta cuando AEIASW confirma el ingreso.</p>
     <div class="resultado-donacion" id="resultado-donacion"></div>
   </div>
 </div>
@@ -405,7 +408,7 @@ const CONFIG = {
       Asociación Española para la Investigación y Ayuda al Síndrome de Wolfram (AEIASW), CIF G91036087, con dirección en Picadilly 7, Costacabana, Almería, 04120. Email de contacto: <a href="mailto:aswolfram@aswolfram.org">aswolfram@aswolfram.org</a>.</p>
 
       <p><strong>Finalidad del tratamiento</strong><br>
-      Los datos que facilitas se utilizan para registrar tu compromiso de donación, facilitar la conciliación posterior del ingreso por Bizum ONG o transferencia, contactar contigo si es necesario y, si procede, emitir el certificado de donación.</p>
+      Los datos que facilitas se utilizan para registrar tu donación y tu declaración de pago, facilitar la conciliación posterior del ingreso por Bizum ONG o transferencia, contactar contigo si es necesario y, si procede, emitir el certificado de donación.</p>
 
       <p><strong>Base legal</strong><br>
       El tratamiento se basa en tu consentimiento explícito al marcar la casilla correspondiente y en el cumplimiento de obligaciones legales relacionadas con donaciones y certificados fiscales.</p>
@@ -463,29 +466,31 @@ const CONFIG = {
   }
 
   function pintarBarra(datos){
+    const registrados = Number(datos.registros_total ?? datos.donantes_registrados ?? datos.donantes_total ?? datos.donantes) || 0;
+    const declarados = Number(datos.donantes_declarados ?? datos.donantes_por_verificar) || 0;
     const confirmados = Number(datos.donantes_confirmados) || 0;
-    const pendientes = Number(datos.donantes_pendientes) || 0;
     const objetivoDonantes = Number(datos.objetivo_donantes) || CONFIG.objetivo_donantes || 100;
     const eurosConfirmados = Number(datos.recaudado_confirmado ?? datos.recaudado) || 0;
-    const pct = Math.min(100, Math.round((confirmados / objetivoDonantes) * 100) || 0);
+    const pct = Math.min(100, Math.round((registrados / objetivoDonantes) * 100) || 0);
 
-    $('donantes-confirmados').textContent = confirmados;
+    $('registros-total').textContent = registrados;
     $('obj-lbl').textContent = objetivoDonantes;
-    $('obj-ext').textContent = objetivoDonantes + ' donantes';
-    $('pendientes').textContent = pendientes;
+    $('obj-ext').textContent = objetivoDonantes + ' registros';
+    $('declarados-pago').textContent = declarados;
+    $('confirmados-aeiasw').textContent = confirmados;
     $('recaudado-confirmado').textContent = eur(eurosConfirmados);
     $('fecha').textContent = fechaBonita(new Date());
     $('pct').textContent = pct > 8 ? pct + '%' : '';
     requestAnimationFrame(() => { $('relleno').style.width = pct + '%'; });
 
-    OBJETIVO_ALCANZADO = confirmados >= objetivoDonantes && objetivoDonantes > 0;
+    OBJETIVO_ALCANZADO = registrados >= objetivoDonantes && objetivoDonantes > 0;
     const avisoEl = $('objetivo-alcanzado');
     if(avisoEl) avisoEl.style.display = OBJETIVO_ALCANZADO ? 'block' : 'none';
     const avisoModalEl = $('aviso-objetivo-modal');
     if(avisoModalEl) avisoModalEl.style.display = OBJETIVO_ALCANZADO ? 'block' : 'none';
     const extraEl = $('extra-objetivo');
     if(extraEl){
-      const extra = confirmados - objetivoDonantes;
+      const extra = registrados - objetivoDonantes;
       if(OBJETIVO_ALCANZADO && extra > 0){
         extraEl.textContent = '+ ' + extra + ' extra';
         extraEl.style.display = 'inline';
@@ -506,8 +511,9 @@ const CONFIG = {
           const t = Array.isArray(datos) ? datos[0] : datos;
           if(t){
             pintarBarra({
-              donantes_confirmados: Number(t.donantes_confirmados ?? t.donantes) || 0,
-              donantes_pendientes: Number(t.donantes_pendientes) || 0,
+              registros_total: Number(t.registros_total ?? t.donantes_registrados ?? t.donantes_total ?? t.donantes) || 0,
+              donantes_declarados: Number(t.donantes_declarados ?? t.donantes_por_verificar) || 0,
+              donantes_confirmados: Number(t.donantes_confirmados) || 0,
               objetivo_donantes: Number(t.objetivo_donantes) || CONFIG.objetivo_donantes,
               recaudado_confirmado: Number(t.recaudado_confirmado ?? t.recaudado) || 0
             });
@@ -521,17 +527,22 @@ const CONFIG = {
   cargarBarra();
   if(BARRA_AUTOMATICA) setInterval(cargarBarra, 15000);
 
-  // Copiar IBAN/Bizum
-  document.querySelectorAll('[data-copy]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      try{
-        await navigator.clipboard.writeText(btn.getAttribute('data-copy'));
-        const original = btn.textContent;
-        btn.textContent = 'Copiado';
-        setTimeout(() => { btn.textContent = original; }, 1400);
-      }catch(e){ alert('No se pudo copiar automáticamente. Copia el dato manualmente.'); }
+  // Copiar datos de pago
+  function activarBotonesCopiar(scope = document){
+    scope.querySelectorAll('[data-copy]').forEach(btn => {
+      if(btn.dataset.copyReady === '1') return;
+      btn.dataset.copyReady = '1';
+      btn.addEventListener('click', async () => {
+        try{
+          await navigator.clipboard.writeText(btn.getAttribute('data-copy'));
+          const original = btn.textContent;
+          btn.textContent = 'Copiado';
+          setTimeout(() => { btn.textContent = original; }, 1400);
+        }catch(e){ alert('No se pudo copiar automáticamente. Copia el dato manualmente.'); }
+      });
     });
-  });
+  }
+  activarBotonesCopiar();
 
   // Modal
   let importeElegido = 0;
@@ -565,19 +576,65 @@ const CONFIG = {
     return el ? el.value : 'bizum';
   }
 
+  let ultimaDonacionRegistrada = null;
+
   function mostrarResultado(data, metodo){
+    ultimaDonacionRegistrada = data;
     const concepto = data.concepto || `${DATOS_PAGO.conceptoBase} ${data.referencia || ''}`.trim();
     const bloquePago = metodo === 'bizum'
-      ? `<p><strong>Ahora haz el Bizum ONG:</strong><br>Código: <code>${DATOS_PAGO.bizum}</code></p>`
-      : `<p><strong>Ahora haz la transferencia:</strong><br>IBAN: <code>${DATOS_PAGO.iban}</code><br>Titular: ${DATOS_PAGO.titular}</p>`;
+      ? `<div class="dato-pago"><div class="k">Bizum ONG</div><div class="v">${DATOS_PAGO.bizum}</div><button class="mini-copy" type="button" data-copy="${DATOS_PAGO.bizum}">Copiar Bizum</button></div>`
+      : `<div class="dato-pago"><div class="k">IBAN</div><div class="v">${DATOS_PAGO.iban}</div><button class="mini-copy" type="button" data-copy="ES7901821454150208537115">Copiar IBAN</button></div><div class="dato-pago"><div class="k">Titular</div><div class="v">${DATOS_PAGO.titular}</div></div>`;
 
     $('resultado-donacion').innerHTML = `
-      <p><strong>Registro recibido.</strong> Tu donación queda pendiente de pago/confirmación.</p>
-      ${bloquePago}
-      <p><strong>Concepto recomendado:</strong><br><code>${concepto}</code></p>
-      <p>Cuando AEIASW confirme el ingreso en banco/Bizum, subirán la barra de donantes confirmados y el importe recaudado.</p>
+      <p><strong>Registro recibido.</strong> Ahora realiza el Bizum o la transferencia con estos datos.</p>
+      <div class="datos-pago">
+        ${bloquePago}
+        <div class="dato-pago"><div class="k">Importe</div><div class="v">${eur(data.importe)}</div></div>
+        <div class="dato-pago"><div class="k">Concepto obligatorio</div><div class="v"><code>${concepto}</code></div><button class="mini-copy" type="button" data-copy="${concepto.replace(/"/g, '&quot;')}">Copiar concepto</button></div>
+      </div>
+      <p>Cuando hayas hecho el Bizum o la transferencia, pulsa este botón para dejar constancia. AEIASW lo verificará después en banco/Bizum.</p>
+      <button type="button" class="modal-donar" id="btn-declarar-pagada">Ya he realizado la donación</button>
+      <p id="estado-declaracion" class="modal-nota">Aún no está confirmada por AEIASW. Quedará pendiente de verificación.</p>
     `;
     $('resultado-donacion').style.display = 'block';
+    activarBotonesCopiar($('resultado-donacion'));
+    const declararBtn = $('btn-declarar-pagada');
+    if(declararBtn) declararBtn.addEventListener('click', declararDonacionPagada);
+  }
+
+  async function declararDonacionPagada(){
+    if(!ultimaDonacionRegistrada?.referencia || !ultimaDonacionRegistrada?.public_token){
+      alert('No encuentro la referencia de esta donación. Vuelve a registrar la donación si el problema continúa.');
+      return;
+    }
+    const btn = $('btn-declarar-pagada');
+    const estado = $('estado-declaracion');
+    if(btn.disabled) return;
+    btn.disabled = true;
+    const old = btn.textContent;
+    btn.textContent = 'Guardando…';
+    try{
+      const r = await fetch('/api/declarar-donacion-pagada', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          referencia: ultimaDonacionRegistrada.referencia,
+          public_token: ultimaDonacionRegistrada.public_token
+        })
+      });
+      const data = await r.json().catch(() => ({}));
+      if(!r.ok || !data.ok){
+        throw new Error(data.error || 'No se pudo marcar la donación como realizada.');
+      }
+      btn.textContent = 'Donación marcada como realizada';
+      estado.textContent = 'Gracias. Tu donación queda pendiente de verificación por AEIASW.';
+      await cargarBarra();
+      setTimeout(cargarBarra, 1200);
+    }catch(e){
+      alert(e.message || 'Error de conexión. Inténtalo de nuevo.');
+      btn.disabled = false;
+      btn.textContent = old;
+    }
   }
 
   $('modal-donar').addEventListener('click', async () => {
@@ -618,7 +675,7 @@ const CONFIG = {
       mostrarResultado(data, metodo);
       await cargarBarra();
       setTimeout(cargarBarra, 1200);
-      btn.textContent = 'Registrado correctamente';
+      btn.textContent = 'Referencia generada';
     }catch(e){
       alert(e.message || 'Error de conexión. Inténtalo de nuevo.');
       btn.disabled = false;

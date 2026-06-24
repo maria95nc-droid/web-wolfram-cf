@@ -53,7 +53,8 @@ th,td{padding:12px;border-bottom:1px solid #f0e5da;text-align:left;vertical-alig
 th{background:#fcf3ea;color:#5b5149;font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;position:sticky;top:0;z-index:1}
 tr:last-child td{border-bottom:0}
 .badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 9px;font-weight:800;font-size:.78rem;white-space:nowrap}
-.pendiente{background:#fff0d8;color:#8a5a10}
+.registrada{background:#eef1ff;color:#33408f}
+.declarada_pagada{background:#fff0d8;color:#8a5a10}
 .confirmado{background:#dff2e6;color:#1f673c}
 .descartado{background:#f5dddd;color:#8e2525}
 .ref{font-weight:800;font-variant-numeric:tabular-nums}
@@ -87,7 +88,7 @@ tr:last-child td{border-bottom:0}
     <header>
       <div>
         <h1>Panel de donaciones</h1>
-        <p class="sub">Confirma solo los pagos que ya aparecen en banco/Bizum. La barra pública sube al cambiar una fila a <b>confirmado</b>.</p>
+        <p class="sub">Confirma solo los pagos que ya aparecen en banco/Bizum. El contador público distingue entre registradas, pago declarado y confirmadas por AEIASW.</p>
       </div>
       <div class="row" style="flex:0 0 auto">
         <button id="recargar" class="sec">Recargar</button>
@@ -96,17 +97,18 @@ tr:last-child td{border-bottom:0}
     </header>
 
     <section class="stats">
-      <div class="stat"><b id="stConfirmados">0</b><span>confirmados</span></div>
-      <div class="stat"><b id="stPendientes">0</b><span>pendientes</span></div>
+      <div class="stat"><b id="stRegistradas">0</b><span>registradas</span></div>
+      <div class="stat"><b id="stDeclaradas">0</b><span>pago declarado</span></div>
+      <div class="stat"><b id="stConfirmados">0</b><span>confirmadas</span></div>
       <div class="stat"><b id="stRecaudado">0 €</b><span>euros confirmados</span></div>
-      <div class="stat"><b id="stObjetivo">100</b><span>objetivo donantes</span></div>
     </section>
 
     <section class="card">
       <div class="controls">
         <div class="filters">
           <button data-filter="" class="act">Todas</button>
-          <button data-filter="pendiente">Pendientes</button>
+          <button data-filter="registrada">Registradas</button>
+          <button data-filter="declarada_pagada">Pago declarado</button>
           <button data-filter="confirmado">Confirmadas</button>
           <button data-filter="descartado">Descartadas</button>
         </div>
@@ -209,16 +211,16 @@ async function cargarDonaciones(){
 }
 
 function renderStats(t){
-  const pendientes = t ? Number(t.donantes_pendientes || 0) : donaciones.filter(d => d.estado === "pendiente").length;
+  const registradas = t ? Number(t.registros_total || t.donantes_registrados || 0) : donaciones.filter(d => ["registrada","declarada_pagada","confirmado"].includes(d.estado)).length;
+  const declaradas = t ? Number(t.donantes_declarados || 0) : donaciones.filter(d => ["declarada_pagada","confirmado"].includes(d.estado)).length;
   const confirmados = t ? Number(t.donantes_confirmados || 0) : donaciones.filter(d => d.estado === "confirmado").length;
   const recaudado = t ? Number(t.recaudado_confirmado || t.recaudado || 0) : donaciones
     .filter(d => d.estado === "confirmado")
     .reduce((sum, d) => sum + Number(d.importe_confirmado || d.importe || 0), 0);
-  const objetivo = t ? Number(t.objetivo_donantes || t.objetivo || 100) : 100;
+  $("stRegistradas").textContent = registradas;
+  $("stDeclaradas").textContent = declaradas;
   $("stConfirmados").textContent = confirmados;
-  $("stPendientes").textContent = pendientes;
   $("stRecaudado").textContent = euros(recaudado);
-  $("stObjetivo").textContent = objetivo;
 }
 
 function renderTabla(){
@@ -234,7 +236,7 @@ function renderTabla(){
     document.querySelectorAll(`[data-action][data-id="${d.id}"]`).forEach(btn => {
       btn.addEventListener("click", async () => {
         const action = btn.dataset.action;
-        const estado = action === "confirmar" ? "confirmado" : action === "descartar" ? "descartado" : "pendiente";
+        const estado = action === "confirmar" ? "confirmado" : action === "descartar" ? "descartado" : action === "declarada" ? "declarada_pagada" : "registrada";
         const importe_confirmado = amountInput ? amountInput.value : "";
         const notas = notesInput ? notesInput.value : "";
         await actualizarDonacion(d.id, estado, importe_confirmado, notas, btn);
@@ -256,11 +258,12 @@ function rowHtml(d){
   const contacto = [d.email, d.dni].filter(Boolean).map(esc).join(" · ");
   const fecha = d.creado ? new Date(d.creado).toLocaleString("es-ES") : "";
   const confirmado = d.importe_confirmado ?? d.importe ?? "";
-  const estado = esc(d.estado || "pendiente");
+  const estadoRaw = d.estado || "registrada";
+  const estado = esc(estadoRaw);
   return `
     <tr>
-      <td><span class="badge ${estado}">${estado}</span></td>
-      <td>${esc(fecha)}${d.confirmado_en ? `<div class="small">Confirmado: ${esc(new Date(d.confirmado_en).toLocaleDateString("es-ES"))}</div>` : ""}</td>
+      <td><span class="badge ${estado}">${esc(estadoLabel(estadoRaw))}</span></td>
+      <td>${esc(fecha)}${d.declarado_pagado_en ? `<div class="small">Pago declarado: ${esc(new Date(d.declarado_pagado_en).toLocaleDateString("es-ES"))}</div>` : ""}${d.confirmado_en ? `<div class="small">Confirmado: ${esc(new Date(d.confirmado_en).toLocaleDateString("es-ES"))}</div>` : ""}</td>
       <td><b>${nombre}</b>${contacto ? `<div class="small">${contacto}</div>` : ""}</td>
       <td><div class="ref">${esc(d.referencia || "")}</div><div class="small">${esc(d.concepto || "")}</div><button type="button" class="copy" data-copy="${esc(d.id)}">Copiar</button></td>
       <td>${esc(d.metodo || "")}</td>
@@ -269,7 +272,8 @@ function rowHtml(d){
       <td><textarea data-notes="${esc(d.id)}" placeholder="Opcional">${esc(d.notas || "")}</textarea></td>
       <td class="actions">
         <button class="ok" data-action="confirmar" data-id="${esc(d.id)}">Confirmar</button>
-        <button class="warn" data-action="pendiente" data-id="${esc(d.id)}">Pendiente</button>
+        <button class="warn" data-action="declarada" data-id="${esc(d.id)}">Pago declarado</button>
+        <button class="sec" data-action="registrada" data-id="${esc(d.id)}">Registrada</button>
         <button class="bad" data-action="descartar" data-id="${esc(d.id)}">Descartar</button>
       </td>
     </tr>`;
@@ -299,6 +303,15 @@ async function actualizarDonacion(id, estado, importe_confirmado, notas, btn){
     btn.disabled = false;
     btn.textContent = old;
   }
+}
+
+function estadoLabel(estado){
+  return {
+    registrada: "registrada",
+    declarada_pagada: "pago declarado",
+    confirmado: "confirmada",
+    descartado: "descartada"
+  }[estado] || estado;
 }
 
 function euros(n){
