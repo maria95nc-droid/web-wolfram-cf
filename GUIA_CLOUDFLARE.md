@@ -1,3 +1,5 @@
+# AEIASW · Web Wolfram restaurada con estética original y barra manual
+
 # Guía rápida · Web Wolfram simple con barra manual
 
 ## Qué cambia esta versión
