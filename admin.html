@@ -94,7 +94,7 @@ async function guardar(){
   const payload = {
     recaudado: leerNumero('recaudado', 0),
     objetivo: leerNumero('objetivo', 1000),
-    donantes: leerEntero('donantes', 0)
+    donantes: 0
   };
   if(payload.recaudado < 0 || payload.objetivo < 1 || payload.donantes < 0){ msg('save-msg','Revisa los números.',false); return; }
   const r = await fetch('/api/admin/actualizar-campana', {
@@ -109,8 +109,6 @@ async function guardar(){
 document.addEventListener('click', (ev)=>{
   const addE = ev.target.closest('[data-add-euros]');
   if(addE){ $('recaudado').value = leerNumero('recaudado', 0)+Number(addE.dataset.addEuros); return; }
-  const addD = ev.target.closest('[data-add-donante]');
-  if(addD){ $('donantes').value = leerEntero('donantes', 0)+Number(addD.dataset.addDonante); return; }
 });
 $('entrar').addEventListener('click', entrar);
 $('guardar').addEventListener('click', guardar);
