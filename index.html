@@ -225,6 +225,64 @@
   .resultado-donacion strong{font-weight:800}
   .resultado-donacion code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#fff;padding:2px 5px;border-radius:5px}
 
+
+
+
+  .share-block{
+    margin-top:18px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:8px;
+  }
+  .share-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:11px;
+    border:0;
+    background:#25D366;
+    color:#fff;
+    border-radius:18px;
+    padding:16px 24px;
+    font-family:inherit;
+    font-size:1.05rem;
+    font-weight:900;
+    letter-spacing:.01em;
+    cursor:pointer;
+    box-shadow:0 14px 30px rgba(37,211,102,.22);
+  }
+  .share-btn svg{width:23px;height:23px;flex:0 0 auto}
+  .share-btn:hover{filter:brightness(.97);transform:translateY(-1px)}
+  .share-btn:active{transform:translateY(0)}
+  .share-help{
+    color:var(--suave);
+    font-size:.9rem;
+    line-height:1.35;
+  }
+  .share-btn-secondary{
+    margin:20px auto 0;
+    display:flex;
+    width:100%;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    border:2px solid rgba(37,211,102,.25);
+    background:#eefcf4;
+    color:#137d3d;
+    border-radius:16px;
+    padding:15px 18px;
+    font-family:inherit;
+    font-size:1rem;
+    font-weight:900;
+    cursor:pointer;
+  }
+  @media(max-width:640px){
+    .share-block{align-items:stretch}
+    .share-btn{width:100%;font-size:1.08rem;padding:17px 18px}
+    .share-help{text-align:center;font-size:.92rem}
+  }
+
 </style>
 </head>
 <body>
@@ -270,6 +328,13 @@ const CONFIG = {
         <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.9-10-9.3C.5 8.6 2 5 5.4 5c2 0 3.3 1.1 4.1 2.3C10.3 6.1 11.6 5 13.6 5 17 5 18.5 8.6 17 11.7 14.5 16.1 12 21 12 21z"/></svg>
         <span data-i18n="hero.boton">QUIERO COLABORAR</span>
       </a>
+        <div class="share-block">
+          <button class="share-btn" type="button" id="share-page" aria-label="Compartir esta página por WhatsApp">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.6l6.8-4.2M8.6 13.4l6.8 4.2"/></svg>
+            Compartir por WhatsApp
+          </button>
+          <div class="share-help">Toca aquí para enviar esta página a familiares y amigos.</div>
+        </div>
     </div>
     <div class="hero-foto">
       <div class="confeti" id="confeti"></div>
@@ -342,6 +407,9 @@ const CONFIG = {
         </div>
       </div>
       <div class="pagos"><span>Transferencia bancaria</span><span class="bizum-chip"><span class="bizum-icon">Bz</span> Bizum</span></div>
+      <button class="share-btn-secondary" type="button" id="share-page-2" aria-label="Compartir esta página">
+        Compartir esta página
+      </button>
     </div>
   </section>
 
@@ -441,6 +509,37 @@ const CONFIG = {
 
   cargarTotales();
 </script>
+  
+
+
+  
+<script>
+(function(){
+  const buttons = [document.getElementById('share-page'), document.getElementById('share-page-2')].filter(Boolean);
+  if(!buttons.length) return;
+
+  const shareUrl = 'https://donaciones.aswolfram.org/';
+  const shareTitle = 'El 26 de junio es su cumpleaños, pero el regalo puede cambiar muchas vidas';
+  const shareText = 'Ayuda a la investigación del Síndrome de Wolfram. Puedes colaborar aquí:';
+
+  async function compartir(){
+    const data = { title: shareTitle, text: shareText, url: shareUrl };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(data);
+        return;
+      } catch (e) {}
+    }
+
+    const msg = encodeURIComponent(shareText + ' ' + shareUrl);
+    window.open('https://wa.me/?text=' + msg, '_blank', 'noopener,noreferrer');
+  }
+
+  buttons.forEach(btn => btn.addEventListener('click', compartir));
+})();
+</script>
+
   <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "98d6591e40af4a0db6e7070198b726ba"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
